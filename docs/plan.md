@@ -11,420 +11,556 @@ Web application for maintaining simplified sales records for unregistered busine
 - Transaction history view
 - Export data to CSV/Excel
 
-## 2. Architecture - Design Principles
+## 2. Architecture
 
-### 2.1. Orthogonality (Separation of Concerns)
+### 2.1. Overview
 
-The directory and module structure must be **orthogonal** – each module is responsible for one specific application layer and can be replaced/adapted independently.
+Two-tier architecture:
+- **Frontend**: Next.js 14+ (App Router) — SSR pages, UI components, API client
+- **Backend**: Python FastAPI — business logic, database access, PDF generation, CSV export
+
+Frontend calls backend via REST API. Next.js rewrites `/api/*` requests to FastAPI in `next.config.js` (both dev and prod).
+
+### 2.2. Directory Structure
 
 ```
-app/                          # Next.js App Router — pages + API
-├── (routes)/                 # Page routes (layout groups)
-│   ├── page.tsx              # Dashboard (home)
-│   ├── layout.tsx            # Root layout
-│   ├── transactions/
-│   │   ├── page.tsx          # List all transactions
-│   │   ├── new/page.tsx      # Add transaction form
-│   │   └── [id]/
-│   │       ├── page.tsx      # View single transaction
-│   │       └── edit/page.tsx # Edit transaction form
-│   └── invoices/
-│       └── [id]/page.tsx     # View/download invoice
-├── api/                      # API Layer
-│   ├── transactions/
-│   │   ├── route.ts          # GET (list), POST (create)
-│   │   └── [id]/route.ts     # GET, PUT, DELETE
-│   ├── invoices/
-│   │   └── [id]/route.ts     # GET (generate PDF)
-│   └── limits/
-│       └── current/route.ts  # GET (current quarter)
-├── components/               # UI Components (presentational)
-│   ├── transactions/
-│   │   ├── transaction-list.tsx
-│   │   ├── transaction-form.tsx
-│   │   └── transaction-row.tsx
-│   ├── dashboard/
-│   │   ├── limit-gauge.tsx
-│   │   ├── recent-transactions.tsx
-│   │   └── quick-add.tsx
-│   └── invoices/
-│       ├── receipt-preview.tsx
-│       └── receipt-actions.tsx
-├── lib/                      # Business Logic (framework-agnostic)
-│   ├── transactions/
-│   │   ├── service.ts        # Transaction CRUD operations
-│   │   └── validation.ts     # Transaction-specific validation
-│   ├── limits/
-│   │   └── service.ts        # Limit calculation logic
-│   ├── invoices/
-│   │   └── service.ts        # PDF generation logic
-│   └── db/
-│       ├── index.ts          # Database connection & client
-│       ├── schema.ts         # Drizzle schema definitions
-│       └── migrate.ts        # Migration runner
-├── models/                   # Data models (type/class definitions)
-│   ├── transaction.ts
-│   ├── limit.ts
-│   └── invoice.ts
-├── types/
-│   └── index.ts              # Shared TypeScript types
-└── utils/
-    ├── date.ts               # Date formatting (Polish locale)
-    ├── validation.ts         # Generic Zod schemas
-    ├── pdf.ts                # PDF rendering helpers
-    ├── csv.ts                # CSV generation helpers
-    └── config.ts             # Environment config reader
+.
+├── Dockerfile.frontend
+├── Dockerfile.backend
+├── docker-compose.yml
+├── Makefile
+├── .env.example
+├── .env                          # Gitignored
+├── .gitignore
+├── frontend/                     # Next.js application (pnpm)
+│   ├── next.config.js
+│   ├── tsconfig.json
+│   ├── tailwind.config.ts
+│   ├── postcss.config.js
+│   ├── package.json
+│   ├── drizzle.config.ts         # Drizzle ORM — used only for TypeScript type gen from DB
+│   ├── app/
+│   │   ├── layout.tsx            # Root layout
+│   │   ├── page.tsx              # Dashboard
+│   │   ├── globals.css
+│   │   ├── transactions/
+│   │   │   ├── page.tsx          # List (server component, fetches from backend)
+│   │   │   ├── new/page.tsx      # Create form (client component)
+│   │   │   └── [id]/
+│   │   │       ├── page.tsx      # Detail view (server component)
+│   │   │       └── edit/page.tsx # Edit form (client component)
+│   │   └── invoices/
+│   │       └── [id]/page.tsx     # Invoice preview + download (client component)
+│   ├── components/               # Presentational UI components
+│   │   ├── ui/                   # shadcn/ui primitives
+│   │   ├── transactions/
+│   │   ├── dashboard/
+│   │   └── invoices/
+│   └── lib/                      # Frontend utilities (no business logic)
+│       ├── api-client.ts         # Fetch wrapper for FastAPI backend
+│       ├── date.ts               # Date formatting (Polish locale)
+│       ├── validation.ts         # Zod schemas (client-side validation only)
+│       ├── csv.ts                # CSV generation (can be frontend-only)
+│       └── config.ts             # Public env var reader (NEXT_PUBLIC_*)
+├── backend/                      # Python FastAPI application (uv)
+│   ├── pyproject.toml
+│   ├── alembic.ini
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py               # FastAPI app, lifespan, CORS
+│   │   ├── config.py             # Settings via pydantic-settings (.env)
+│   │   ├── database.py           # SQLAlchemy engine + session
+│   │   ├── models/               # SQLAlchemy ORM models
+│   │   │   ├── __init__.py
+│   │   │   ├── transaction.py
+│   │   │   └── counter.py
+│   │   ├── schemas/              # Pydantic request/response schemas
+│   │   │   ├── __init__.py
+│   │   │   ├── transaction.py
+│   │   │   ├── limit.py
+│   │   │   └── invoice.py
+│   │   ├── routers/              # FastAPI route handlers
+│   │   │   ├── __init__.py
+│   │   │   ├── transactions.py
+│   │   │   ├── limits.py
+│   │   │   └── invoices.py
+│   │   ├── services/             # Business logic
+│   │   │   ├── __init__.py
+│   │   │   ├── transaction.py
+│   │   │   ├── limit.py
+│   │   │   └── invoice.py
+│   │   └── utils/
+│   │       ├── __init__.py
+│   │       ├── date.py
+│   │       └── pdf.py            # ReportLab receipt generator
+│   └── alembic/                  # DB migrations
+│       └── versions/
+└── data/                         # SQLite DB volume (gitignored)
 ```
 
-### 2.2. Future-Proof Modularity
+### 2.3. Orthogonality Principles
 
-- **Database**: Currently SQLite (`database.sqlite`). The `lib/db` layer abstracts database access so that switching to PostgreSQL only requires changes in Drizzle schema dialect and connection config.
-- **Framework**: Next.js App Router. UI split into "smart" (page containers) and "dumb" (presentational `components/`) — pages import components, components never import pages.
-- **Validation**: Zod schemas defined in `lib/*/validation.ts`, reused by both client forms and API routes.
+- **Frontend knows nothing about backend internals** — communicates only through REST API contracts (Pydantic schemas mirrored as TypeScript types)
+- **Business logic lives only in `backend/app/services/`** — framework-agnostic, testable without FastAPI
+- **Database access only through `backend/app/models/`** — switching from SQLite to PostgreSQL means changing SQLAlchemy connection string + Alembic dialect
+- **UI components in `frontend/components/` are pure** — no API calls, no business logic, receive data via props
+- **Page components are thin** — fetch data or parse params, delegate rendering to components
 
 ## 3. Technology Stack
 
+### 3.1. Frontend (Next.js)
+
 | Component | Technology | Notes |
 |-----------|------------|-------|
-| Framework | Next.js 14+ (App Router) | With SSR and API Routes |
-| Language | TypeScript | Strict mode, `strict: true` in tsconfig |
-| ORM/Database | Drizzle ORM + SQLite (better-sqlite3) | Easy migration to PostgreSQL via drizzle-orm/pg |
-| UI | Tailwind CSS + shadcn/ui | Component library (button, card, dialog, table, form) |
-| PDF | @react-pdf/renderer | Receipt generation from React components |
-| Validation | Zod | Shared schemas for client + server |
-| Testing | Vitest + @testing-library/react | Unit + component tests (optional MVP phase) |
-| Deployment | Docker + Makefile | `make start` / `make stop` |
+| Framework | Next.js 14+ (App Router) | SSR pages, no API routes |
+| Language | TypeScript | Strict mode |
+| Package manager | pnpm | |
+| UI | Tailwind CSS v3 + shadcn/ui | Style: Default, Base color: Zinc, CSS variables: yes |
+| Validation (client) | Zod | Shared with TypeScript types |
+| Testing | Vitest + @testing-library/react | |
+| State | React Server Components + fetch | No client-state library for MVP |
 
-### 3.1. Key Dependencies (package.json)
+### 3.2. Backend (Python)
 
-```jsonc
-{
-  "dependencies": {
-    "next": "^14.2",
-    "react": "^18",
-    "react-dom": "^18",
-    "drizzle-orm": "^0.36",
-    "better-sqlite3": "^11",
-    "@react-pdf/renderer": "^4",
-    "zod": "^3.23",
-    "uuid": "^10",
-    "date-fns": "^4",
-    "date-fns/locale/pl": "^4"
-  },
-  "devDependencies": {
-    "typescript": "^5",
-    "@types/better-sqlite3": "^7",
-    "@types/uuid": "^10",
-    "drizzle-kit": "^0.28",
-    "tailwindcss": "^3.4",
-    "postcss": "^8",
-    "autoprefixer": "^10",
-    "@tailwindcss/forms": "^0.5",
-    "vitest": "^2",
-    "@testing-library/react": "^16",
-    "eslint": "^8",
-    "eslint-config-next": "^14"
-  }
-}
-```
+| Component | Technology | Notes |
+|-----------|------------|-------|
+| Runtime | Python 3.12+ | |
+| Framework | FastAPI | With uvicorn ASGI server |
+| Package manager | uv | `uv add`, `uv sync`, `uv run` |
+| ORM | SQLAlchemy 2.0+ | Async or sync (SQLite: sync for simplicity) |
+| Migrations | Alembic | Auto-generation from model changes |
+| Validation | Pydantic v2 | Request/response schemas |
+| PDF generation | ReportLab | Receipt PDF |
+| CSV export | Python csv (stdlib) | |
+| Testing | pytest + httpx (async test client) | |
+| Config | pydantic-settings | Reads from `.env` |
+
+### 3.3. Communication
+
+- FastAPI serves on `http://backend:8000` (Docker) or `http://localhost:8000` (dev)
+- Next.js rewrites `/api/*` → `http://backend:8000/api/*` via `next.config.js` rewrites
+- In development, Next.js proxies to localhost:8000
+- In production Docker, proxies to backend service name
 
 ## 4. Data Models
 
-### 4.1. Transaction
+### 4.1. Transaction (SQLAlchemy model)
 
-```typescript
-interface Transaction {
-  id: string;            // UUID v4
-  date: string;          // ISO date (YYYY-MM-DD)
-  description: string;   // Item description (e.g. "3D Print - phone holder, PLA")
-  amount: number;        // Gross amount in PLN (max 2 decimal places)
-  invoiceNumber: string | null;  // Auto-generated receipt number (e.g. "R/2026/001")
-  notes: string | null;  // Optional internal note
-  createdAt: string;     // ISO datetime
-  updatedAt: string;     // ISO datetime
-}
+```python
+# backend/app/models/transaction.py
+from sqlalchemy import Column, String, Float, DateTime
+import uuid
+from datetime import datetime
+
+class Transaction(Base):
+    __tablename__ = "transactions"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    date = Column(String, nullable=False)              # ISO date "YYYY-MM-DD"
+    description = Column(String, nullable=False)
+    amount = Column(Float, nullable=False)             # Gross PLN, max 2 decimals
+    invoice_number = Column(String, nullable=True)     # e.g. "R/2026/001"
+    notes = Column(String, nullable=True)
+    deleted_at = Column(DateTime, nullable=True)       # Soft delete
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 ```
 
-### 4.2. Limit (calculated, not stored)
+### 4.2. Counter (SQLAlchemy model)
 
-```typescript
-interface QuarterlyLimit {
-  year: number;           // e.g. 2026
-  quarter: number;        // 1-4
-  limit: number;          // Max gross amount for quarter (e.g. 10813.50)
-  used: number;           // Sum of transaction amounts in this quarter
-  remaining: number;      // limit - used
-  isExceeded: boolean;    // used > limit
-}
+```python
+# backend/app/models/counter.py
+from sqlalchemy import Column, String, Integer
+
+class Counter(Base):
+    __tablename__ = "counters"
+
+    id = Column(String, primary_key=True)   # e.g. "receipt-2026"
+    value = Column(Integer, nullable=False, default=0)
 ```
 
-No stored model — computed from transactions at query time. Limit value read from config.
+### 4.3. Pydantic Schemas
 
-### 4.3. Invoice / Receipt (generated, not stored)
+```python
+# backend/app/schemas/transaction.py
+from pydantic import BaseModel, Field
+from datetime import date, datetime
+from typing import Optional
 
-```typescript
-interface ReceiptData {
-  invoiceNumber: string;         // "R/2026/001"
-  issueDate: string;             // ISO date
-  seller: {
-    name: string;
-    address: string;
-    nip?: string;                // Optional tax ID
-  };
-  buyer: {
-    name: string;                // "Nabywca" (simplified receipt — no buyer details required)
-  };
-  items: Array<{
-    description: string;
-    quantity: number;            // Always 1 for MVP
-    unit: string;                // "szt."
-    unitPrice: number;           // amount (gross)
-    total: number;               // amount (gross)
-  }>;
-  total: number;                 // Gross total
-}
+class TransactionCreate(BaseModel):
+    date: date
+    description: str = Field(min_length=1, max_length=500)
+    amount: float = Field(gt=0, le=1000000)
+    notes: Optional[str] = None
+
+class TransactionUpdate(BaseModel):
+    date: Optional[date] = None
+    description: Optional[str] = Field(None, min_length=1, max_length=500)
+    amount: Optional[float] = Field(None, gt=0, le=1000000)
+    notes: Optional[str] = None
+
+class TransactionResponse(BaseModel):
+    id: str
+    date: str
+    description: str
+    amount: float
+    invoice_number: Optional[str]
+    notes: Optional[str]
+    created_at: str
+    updated_at: str
 ```
 
-Receipts are generated on-demand as PDF and never stored in DB. Re-generation uses same deterministic invoice number.
+```python
+# backend/app/schemas/limit.py
+from pydantic import BaseModel
+
+class QuarterlyLimitResponse(BaseModel):
+    year: int
+    quarter: int
+    limit: float
+    used: float
+    remaining: float
+    is_exceeded: bool
+```
+
+```python
+# backend/app/schemas/invoice.py
+from pydantic import BaseModel
+from typing import List, Optional
+
+class SellerInfo(BaseModel):
+    name: str
+    address: str
+    nip: Optional[str] = None
+
+class InvoiceItem(BaseModel):
+    description: str
+    quantity: int = 1
+    unit: str = "szt."
+    unit_price: float
+    total: float
+
+class InvoiceResponse(BaseModel):
+    invoice_number: str
+    issue_date: str
+    seller: SellerInfo
+    items: List[InvoiceItem]
+    total: float
+```
+
+### 4.4. API Response Envelope
+
+```python
+# backend/app/schemas/common.py
+from pydantic import BaseModel
+from typing import Generic, TypeVar, List, Optional
+
+T = TypeVar("T")
+
+class PaginatedResponse(BaseModel):
+    data: List[T]
+    meta: dict  # {"page": 1, "limit": 10, "total": 42, "total_pages": 5}
+
+class ErrorResponse(BaseModel):
+    error: dict  # {"code": "VALIDATION_ERROR", "message": "...", "details": [...]}
+```
+
+All endpoints return:
+- 200: `PaginatedResponse` (lists) or direct object (single resource)
+- 400: `ErrorResponse` with `VALIDATION_ERROR` code
+- 404: `ErrorResponse` with `NOT_FOUND` code
+- 500: `ErrorResponse` with `INTERNAL_ERROR` code
 
 ## 5. Environment Configuration
 
-All config loaded via `utils/config.ts` which reads `process.env` at runtime.
+### 5.1. `.env.example`
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `DATABASE_URL` | Yes | `file:./data/database.sqlite` | SQLite path (production: `/app/data/database.sqlite`) |
-| `NEXT_PUBLIC_APP_URL` | No | `http://localhost:3000` | Public-facing app URL |
-| `SELLER_NAME` | Yes | — | Seller name for receipts |
-| `SELLER_ADDRESS` | Yes | — | Seller street + city for receipts |
-| `SELLER_NIP` | No | — | Seller tax ID (optional, some formats require it) |
-| `QUARTERLY_LIMIT` | No | `10813.50` | Quarterly revenue limit in PLN (updates yearly) |
-| `RECEIPT_PREFIX` | No | `R` | Prefix for auto-generated receipt numbers |
+```
+# Database
+DATABASE_URL=sqlite:///./data/database.sqlite
 
-`.env.example` file tracked in git; `.env` gitignored.
+# Seller info (receipts)
+SELLER_NAME=
+SELLER_ADDRESS=
+SELLER_NIP=
+
+# App config
+QUARTERLY_LIMIT=10813.50
+RECEIPT_PREFIX=R
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Backend config (uvicorn)
+BACKEND_HOST=0.0.0.0
+BACKEND_PORT=8000
+```
+
+| Variable | Required | Default | Used by | Description |
+|----------|----------|---------|---------|-------------|
+| `DATABASE_URL` | Yes | — | Backend | SQLAlchemy connection string |
+| `SELLER_NAME` | Yes | — | Backend | Seller name on receipts |
+| `SELLER_ADDRESS` | Yes | — | Backend | Seller street + city on receipts |
+| `SELLER_NIP` | No | — | Backend | Seller tax ID |
+| `QUARTERLY_LIMIT` | No | `10813.50` | Backend | Quarterly revenue limit |
+| `RECEIPT_PREFIX` | No | `R` | Backend | Receipt number prefix |
+| `NEXT_PUBLIC_APP_URL` | No | `http://localhost:3000` | Frontend | Public URL |
+| `BACKEND_HOST` | No | `0.0.0.0` | Backend | Uvicorn bind address |
+| `BACKEND_PORT` | No | `8000` | Backend | Uvicorn port |
+
+### 5.2. Backend Config (`backend/app/config.py`)
+
+Uses `pydantic-settings` to load from `.env`:
+
+```python
+from pydantic_settings import BaseSettings
+
+class Settings(BaseSettings):
+    database_url: str
+    seller_name: str
+    seller_address: str
+    seller_nip: str | None = None
+    quarterly_limit: float = 10813.50
+    receipt_prefix: str = "R"
+
+    class Config:
+        env_file = "../.env"
+```
 
 ## 6. Frontend Routes (Pages)
 
-| Route | Page | Purpose |
-|-------|------|---------|
-| `/` | Dashboard | Limit gauge, last 10 transactions, quick-add button |
-| `/transactions` | Transaction list | Paginated table with filters; add/edit/delete actions |
-| `/transactions/new` | New transaction | Form: date, description, amount, notes |
-| `/transactions/:id` | Transaction detail | View single transaction, actions: edit, delete, generate receipt |
-| `/transactions/:id/edit` | Edit transaction | Pre-filled form |
-| `/invoices/:id` | Invoice view | Preview receipt PDF + download button |
+| Route | Page type | Purpose |
+|-------|-----------|---------|
+| `/` | Server component | Dashboard — fetches limit + recent transactions from backend |
+| `/transactions` | Server component | Paginated list — fetches from backend, passes to client table component |
+| `/transactions/new` | Client component | Form — POST to backend on submit |
+| `/transactions/:id` | Server component | Detail view — fetches single transaction |
+| `/transactions/:id/edit` | Client component | Pre-filled form — PUT to backend on submit |
+| `/invoices/:id` | Client component | Fetches invoice data from backend, renders receipt preview via React + download button. PDF download hits `/api/invoices/:id/download` directly. |
 
-Navigation: Top navbar with links to Dashboard, Transactions, and Add Transaction.
+**Component boundary rule**:
+- Pages that only **display** data (dashboard, list, detail) = Server Components. Data fetching done directly with `fetch()`.
+- Pages that have **forms/interactivity** (new, edit, invoice preview) = Client Components marked with `"use client"`.
+- Presentational components in `components/` are **never** pages — they accept props, no data fetching.
 
-## 7. Features (MVP)
+## 7. API Endpoints (FastAPI)
 
-### 7.1. Dashboard
+| Method | Endpoint | Request | Response | Description |
+|--------|----------|---------|----------|-------------|
+| GET | `/api/transactions` | Query: `page`, `limit`, `from`, `to`, `search` | `PaginatedResponse[TransactionResponse]` | List with pagination + filters |
+| POST | `/api/transactions` | Body: `TransactionCreate` | `TransactionResponse` (201) | Create transaction |
+| GET | `/api/transactions/{id}` | — | `TransactionResponse` | Get single transaction |
+| PUT | `/api/transactions/{id}` | Body: `TransactionUpdate` | `TransactionResponse` | Update transaction |
+| DELETE | `/api/transactions/{id}` | — | `204 No Content` | Soft delete |
+| GET | `/api/limits/current` | — | `QuarterlyLimitResponse` | Current quarter limit info |
+| GET | `/api/invoices/{id}` | — | `InvoiceResponse` (JSON) | Invoice data (for preview) |
+| GET | `/api/invoices/{id}/download` | — | `application/pdf` | Download PDF receipt |
 
-- Display current quarterly limit (used / remaining) — colored gauge
-- List of last 10 transactions (summary)
-- Quick "Add Transaction" floating button
-- Warning banner if limit exceeded (red)
+All mutation endpoints validated with Pydantic. Soft delete sets `deleted_at` timestamp. List queries exclude soft-deleted records by default.
 
-### 7.2. Transaction Management
+## 8. Features (MVP)
+
+### 8.1. Dashboard
+
+- Limit gauge: colored bar showing used / remaining for current quarter
+- Last 10 transactions summary list
+- Quick "Add Transaction" floating button → navigates to `/transactions/new`
+- Red warning banner when limit exceeded
+
+### 8.2. Transaction Management
 
 | Operation | Implementation |
 |-----------|---------------|
-| Create | Form with date (default today), description, amount, optional notes. Validated client + server with Zod. |
-| Read | Paginated table (10 per page), sortable by date/amount, filter by date range + description search. |
-| Update | Edit form, pre-filled. PUT endpoint. |
-| Delete | Confirm dialog → soft delete (set `deletedAt`). Hard delete option in admin view. |
-| Receipt | "Generate receipt" button → opens invoice page with PDF preview. |
+| Create | Form with date (default today), description, amount, optional notes. Client validation with Zod, server validation with Pydantic. |
+| Read | Server-component table, 10 per page, sortable by date/amount, filter by date range + description search |
+| Update | Edit form, pre-filled. `PUT /api/transactions/{id}` |
+| Delete | Confirm dialog → `DELETE /api/transactions/{id}` (soft delete). Hard delete not exposed in MVP UI. |
+| Receipt | Button on detail page → navigates to `/invoices/{id}` |
 
-### 7.3. PDF Receipt Generation
+### 8.3. PDF Receipt Generation
 
-- Triggered from transaction detail or list (single transaction)
+- Backend generates PDF via ReportLab
 - Receipt layout:
-  - Header: seller info + receipt number + issue date
-  - Line item: description, quantity, unit price, total
-  - Footer: total gross amount, seller signature line
-- Auto-incrementing receipt number format: `{PREFIX}/{YEAR}/{SEQUENCE}` (e.g. `R/2026/001`)
-- Sequence persisted in a small JSON file or a separate `counters` table in SQLite
-- Seller data from `.env` config
-- Downloaded as PDF via browser download
+  - Header: SELLER_NAME, SELLER_ADDRESS, NIP (if set), receipt number, issue date
+  - Item row: description, quantity "szt.", unit price, total
+  - Footer: total gross amount, "Sprzedaż nierejestrowana — paragon bez NIP nabywcy"
+- Receipt number: `{PREFIX}/{YEAR}/{SEQUENCE}` (e.g. `R/2026/001`)
+- Sequence stored in `counters` table, keyed by year (`receipt-2026`, `receipt-2027`, ...). New year resets to 1.
+- PDF download via `/api/invoices/{id}/download`
+- Frontend preview via `/invoices/{id}` — fetches `InvoiceResponse` JSON, renders with React components (no PDF viewer, just styled HTML preview)
 
-### 7.4. Data Export
+### 8.4. Data Export
 
-- Export all transactions (or filtered by date range) to CSV
 - Button on transaction list page
+- Triggers CSV download generated by backend at `/api/transactions/export?from=&to=`
+- Backend endpoint returns `text/csv` with UTF-8 BOM for Excel compatibility
 - Columns: date, description, amount, invoice number, notes
-- UTF-8 BOM for Excel compatibility (Polish characters)
 
-## 8. Database Schema (Drizzle ORM)
+## 9. Database (SQLAlchemy + Alembic)
 
-### 8.1. `drizzle.config.ts`
+### 9.1. Migrations
 
-```typescript
-import { defineConfig } from "drizzle-kit";
-
-export default defineConfig({
-  dialect: "sqlite",
-  schema: "./app/lib/db/schema.ts",
-  out: "./drizzle",
-  dbCredentials: {
-    url: process.env.DATABASE_URL ?? "file:./data/database.sqlite",
-  },
-});
+```bash
+cd backend
+uv run alembic init alembic          # One-time setup
+uv run alembic revision --autogenerate -m "add transactions table"
+uv run alembic upgrade head
 ```
 
-### 8.2. Schema (`app/lib/db/schema.ts`)
+### 9.2. alembic.ini
 
-```typescript
-import { sqliteTable, text, real, integer } from "drizzle-orm/sqlite-core";
-
-export const transactions = sqliteTable("transactions", {
-  id: text("id").primaryKey(),
-  date: text("date").notNull(),                  // ISO date string
-  description: text("description").notNull(),
-  amount: real("amount").notNull(),
-  invoiceNumber: text("invoice_number"),
-  notes: text("notes"),
-  deletedAt: text("deleted_at"),                  // Soft delete
-  createdAt: text("created_at").notNull(),
-  updatedAt: text("updated_at").notNull(),
-});
-
-// Simple counter table for receipt numbering
-export const counters = sqliteTable("counters", {
-  id: text("id").primaryKey(),                   // e.g. "receipt-2026"
-  value: integer("value").notNull().default(0),
-});
+```
+sqlalchemy.url = sqlite:///./data/database.sqlite
 ```
 
-### 8.3. Migrations
+### 9.3. Database session
 
-- `npm run db:generate` — `drizzle-kit generate`
-- `npm run db:push` — `drizzle-kit push` (dev only, auto-apply)
-- `npm run db:migrate` — programmatic migration via `drizzle-orm` migrator
-- Migrations run automatically on `next start` in production (`lib/db/migrate.ts`)
+```python
+# backend/app/database.py
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-## 9. API Structure (Endpoints)
+engine = create_engine(
+    settings.database_url,
+    connect_args={"check_same_thread": False}  # SQLite-specific
+)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+```
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/transactions` | List transactions (query: `page`, `limit`, `from`, `to`, `search`) |
-| POST | `/api/transactions` | Create transaction (body: date, description, amount, notes) |
-| GET | `/api/transactions/:id` | Get single transaction |
-| PUT | `/api/transactions/:id` | Update transaction |
-| DELETE | `/api/transactions/:id` | Soft-delete transaction |
-| GET | `/api/limits/current` | Current quarter limit info (used, remaining, isExceeded) |
-| GET | `/api/invoices/:id` | Generate & return PDF receipt for transaction `:id` |
+## 10. Component Boundary Rules (Next.js)
 
-All endpoints return JSON (except `/api/invoices/:id` which returns `application/pdf`).
+| File type | `"use client"`? | Logic |
+|-----------|----------------|-------|
+| `app/page.tsx` (dashboard) | No | Server component, fetches data |
+| `app/transactions/page.tsx` | No | Server component, fetches paginated data |
+| `app/transactions/new/page.tsx` | Yes | Form with client state |
+| `app/transactions/[id]/page.tsx` | No | Server component, fetches single item |
+| `app/transactions/[id]/edit/page.tsx` | Yes | Form with client state |
+| `app/invoices/[id]/page.tsx` | Yes | Fetches JSON, renders preview |
+| `components/**/*.tsx` | Only if interactive | Pure presentational |
+| `lib/api-client.ts` | No | Shared fetch utility |
 
-All mutation endpoints validate request body with Zod. On validation error, return `400 { error: { code: "VALIDATION_ERROR", details: [...] } }`.
+## 11. Frontend Configuration
 
-## 10. Next.js Configuration
-
-### 10.1. `next.config.js`
+### 11.1. `next.config.js`
 
 ```javascript
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",  // Required for Docker multi-stage build
-  experimental: {
-    serverComponentsExternalPackages: ["better-sqlite3"],
-  },
+  output: "standalone",
+  rewrites: async () => [
+    {
+      source: "/api/:path*",
+      destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/:path*`,
+    },
+  ],
 };
 
 module.exports = nextConfig;
 ```
 
-### 10.2. `tsconfig.json` — strict mode
+### 11.2. Tailwind + shadcn/ui
 
-```jsonc
-{
-  "compilerOptions": {
-    "strict": true,
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "jsx": "preserve",
-    "paths": {
-      "@/*": ["./app/*"]
-    }
-  }
-}
-```
+- shadcn/ui style: **Default**
+- Base color: **Zinc**
+- CSS variables: **yes**
+- Components for MVP: `button`, `card`, `dialog`, `table`, `form`, `input`, `label`, `select`, `badge`, `toast`
 
-## 11. Deployment (Docker)
+## 12. Deployment (Docker)
 
-### 11.1. `docker-compose.yml` (Compose v2)
+### 12.1. `docker-compose.yml`
 
 ```yaml
 services:
-  app:
-    build: .
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=sqlite:///app/data/database.sqlite
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=file:/app/data/database.sqlite
-      - SELLER_NAME=${SELLER_NAME}
-      - SELLER_ADDRESS=${SELLER_ADDRESS}
-      - SELLER_NIP=${SELLER_NIP}
-      - QUARTERLY_LIMIT=${QUARTERLY_LIMIT:-10813.50}
-      - RECEIPT_PREFIX=${RECEIPT_PREFIX:-R}
-    env_file:
-      - .env
-    volumes:
-      - ./data:/app/data
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+    depends_on:
+      - backend
     restart: unless-stopped
 ```
 
-### 11.2. `Dockerfile`
+### 12.2. `Dockerfile.backend`
+
+```dockerfile
+FROM python:3.12-slim AS base
+
+RUN pip install uv
+
+WORKDIR /app
+COPY backend/pyproject.toml backend/uv.lock* ./
+RUN uv sync --frozen --no-dev
+
+COPY backend/ .
+
+EXPOSE 8000
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+### 12.3. `Dockerfile.frontend`
 
 ```dockerfile
 FROM node:20-alpine AS base
 
-# Dependencies
+# pnpm setup
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 FROM base AS deps
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
-# Builder
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-RUN npm run build
+COPY frontend/ .
+RUN pnpm build
 
-# Runner
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/drizzle ./drizzle     # Migration files
 EXPOSE 3000
 CMD ["node", "server.js"]
 ```
 
-Note: Production startup also runs DB migrations. The `server.js` entrypoint from `next start --standalone` is extended via a small wrapper or `postinstall` script to call `lib/db/migrate.ts` before starting.
-
-### 11.3. `Makefile`
+### 12.4. `Makefile`
 
 ```makefile
-.PHONY: start stop build logs clean
+.PHONY: start stop build logs clean dev dev-backend dev-frontend
 
 start:
 	docker compose up -d
-	@echo "✅ Application started at http://localhost:3000"
+	@echo "✅ App at http://localhost:3000"
 
 stop:
 	docker compose down
-	@echo "✅ Application stopped"
+	@echo "✅ Stopped"
 
 build:
 	docker compose build
-	@echo "✅ Image built"
+	@echo "✅ Images built"
 
 logs:
 	docker compose logs -f
@@ -432,56 +568,172 @@ logs:
 clean:
 	docker compose down -v
 	rm -rf ./data
-	@echo "✅ Data and containers removed"
+	@echo "✅ Cleaned"
 
 restart: stop start
 
+dev-backend:
+	cd backend && uv run uvicorn app.main:app --reload --port 8000
+
+dev-frontend:
+	cd frontend && pnpm dev
+
 dev:
-	npm run dev
-	@echo "✅ Dev server at http://localhost:3000"
+	@echo "Run in separate terminals:"
+	@echo "  make dev-backend"
+	@echo "  make dev-frontend"
 ```
 
-### 11.4. Project Root Structure
+### 12.5. Project Root
 
 ```
 .
-├── Dockerfile
+├── Dockerfile.frontend
+├── Dockerfile.backend
 ├── docker-compose.yml
 ├── Makefile
-├── .env.example          # Tracked in git
-├── .env                  # Gitignored
+├── .env.example
+├── .env
 ├── .gitignore
-├── next.config.js
-├── tsconfig.json
-├── tailwind.config.ts
-├── postcss.config.js
-├── drizzle.config.ts
-├── package.json
-├── data/                 # SQLite DB volume (gitignored)
-├── drizzle/              # Migration files (generated)
-└── app/                  # Next.js application directory
-    ├── layout.tsx
-    ├── page.tsx
-    ├── globals.css
-    └── ...
+├── frontend/
+│   ├── next.config.js
+│   ├── tsconfig.json
+│   ├── tailwind.config.ts
+│   ├── postcss.config.js
+│   ├── package.json
+│   ├── drizzle.config.ts
+│   ├── app/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── globals.css
+│   │   ├── transactions/
+│   │   └── invoices/
+│   ├── components/
+│   │   └── ui/
+│   └── lib/
+│       ├── api-client.ts
+│       ├── date.ts
+│       ├── validation.ts
+│       └── config.ts
+├── backend/
+│   ├── pyproject.toml
+│   ├── alembic.ini
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── routers/
+│   │   ├── services/
+│   │   └── utils/
+│   └── alembic/
+│       └── versions/
+└── data/
 ```
 
-## 12. Testing Strategy (MVP)
+## 13. Testing Strategy (MVP)
 
-- **Unit tests**: Vitest for `lib/` business logic (limit calculation, validation, date utils)
-- **Component tests**: @testing-library/react for form components
-- **API tests**: Vitest with API route integration tests (SQLite in-memory)
-- **Target**: Not blocking MVP, but test setup included from day 1 to avoid retrofitting
+### 13.1. Backend (pytest)
 
-## 13. Implementation Order
+```bash
+cd backend
+uv run pytest                          # All tests
+uv run pytest tests/ -v               # Verbose
+```
+
+- Tests in `backend/tests/` mirror `app/` structure
+- `test_routers/` — httpx AsyncClient against FastAPI test app
+- `test_services/` — pure unit tests for business logic
+- In-memory SQLite for test DB
+
+### 13.2. Frontend (Vitest)
+
+```bash
+cd frontend
+pnpm vitest                            # All tests
+```
+
+- `test_utils/` — date formatting, validation schemas
+- `test_components/` — @testing-library/react for form components
+- No API-calling tests for MVP (covered by backend tests)
+
+## 14. Implementation Phases
 
 | Phase | What | Depends On |
 |-------|------|------------|
-| 1 | Scaffold: Next.js + Tailwind + Drizzle + shadcn/ui setup, `.env.example`, config files | — |
-| 2 | Database: schema, migrations, seed script | Phase 1 |
-| 3 | API: transactions CRUD + limit endpoint | Phase 2 |
-| 4 | UI: transaction list + form pages | Phase 3 |
-| 5 | Dashboard: limit gauge, recent transactions | Phase 4 |
-| 6 | PDF: receipt generation, invoice page | Phase 3 |
-| 7 | CSV export | Phase 4 |
-| 8 | Docker: compose, Dockerfile, Makefile | Phase 1 |
+| **1** | Scaffold: `frontend/` (Next.js + Tailwind + shadcn/ui + pnpm), `backend/` (FastAPI + uv + SQLAlchemy + Alembic), `docker-compose.yml`, `.env.example`, configs | — |
+| **2** | Backend DB: models (`Transaction`, `Counter`), database session, initial Alembic migration | Phase 1 |
+| **3** | Backend API: transactions CRUD, limit endpoint, invoice data endpoint | Phase 2 |
+| **4** | Frontend: API client, transaction list page, new/edit forms, detail page | Phase 1 + 3 |
+| **5** | Dashboard: limit gauge component, recent transactions, quick-add | Phase 4 |
+| **6** | PDF: ReportLab receipt generator, download endpoint, invoice preview page | Phase 3 |
+| **7** | CSV: export endpoint, download button on list page | Phase 3 |
+| **8** | Docker: Dockerfiles, production compose, Makefile polish | Phase 1 |
+
+## 15. Key Dependencies
+
+### 15.1. Frontend (`frontend/package.json`)
+
+```jsonc
+{
+  "dependencies": {
+    "next": "^14.2",
+    "react": "^18",
+    "react-dom": "^18",
+    "zod": "^3.23",
+    "date-fns": "^4",
+    "date-fns/locale/pl": "^4",
+    "class-variance-authority": "^0.7",
+    "clsx": "^2",
+    "tailwind-merge": "^2",
+    "lucide-react": "^0.400"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "tailwindcss": "^3.4",
+    "postcss": "^8",
+    "autoprefixer": "^10",
+    "tailwindcss-animate": "^1",
+    "vitest": "^2",
+    "@testing-library/react": "^16",
+    "eslint": "^8",
+    "eslint-config-next": "^14",
+    "drizzle-kit": "^0.28",
+    "drizzle-orm": "^0.36",
+    "@libsql/client": "^0.14"
+  }
+}
+```
+
+### 15.2. Backend (`backend/pyproject.toml`)
+
+```toml
+[project]
+name = "ewidencja3d-backend"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "sqlalchemy>=2.0",
+    "alembic>=1.14",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "reportlab>=4.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "httpx>=0.28",
+    "pytest-asyncio>=0.24",
+]
+
+[tool.uv]
+dev-dependencies = ["dev"]
+```
