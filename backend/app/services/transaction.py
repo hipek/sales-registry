@@ -97,4 +97,6 @@ class TransactionService:
             amount=transaction.amount,
             invoice_number=transaction.invoice_number,
             notes=transaction.notes,
+            created_at=transaction.created_at.isoformat(),
+            updated_at=transaction.updated_at.isoformat(),
         )

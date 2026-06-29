@@ -1,6 +1,8 @@
 node_modules/
 data/
 .env
+.env.local
+*.env.local
 frontend/.next/
 frontend/node_modules/
 backend/__pycache__/

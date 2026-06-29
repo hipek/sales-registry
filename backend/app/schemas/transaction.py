@@ -24,3 +24,5 @@ class TransactionResponse(BaseModel):
     amount: float
     invoice_number: Optional[str] = None
     notes: Optional[str] = None
+    created_at: str
+    updated_at: str

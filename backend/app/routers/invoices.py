@@ -3,23 +3,26 @@ from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.transaction import Transaction
 from app.schemas.invoice import InvoiceResponse
 from app.services.invoice import InvoiceService
+from app.services.transaction import TransactionService
 from app.utils.pdf import generate_receipt_pdf
 from app.config import settings
 
 router = APIRouter()
 
 
+def _get_transaction_or_404(db: Session, transaction_id: str):
+    svc = TransactionService()
+    txn = svc.get_by_id(db, transaction_id)
+    if not txn:
+        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND", "message": "Transaction not found"})
+    return txn
+
+
 @router.get("/{transaction_id}", response_model=InvoiceResponse)
 def get_invoice(transaction_id: str, db: Session = Depends(get_db)):
-    transaction = db.query(Transaction).filter(
-        Transaction.id == transaction_id, Transaction.deleted_at.is_(None)
-    ).first()
-    if not transaction:
-        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND", "message": "Transaction not found"})
-
+    transaction = _get_transaction_or_404(db, transaction_id)
     service = InvoiceService()
     invoice = service.get_invoice(db, transaction, settings)
     return invoice
@@ -27,12 +30,7 @@ def get_invoice(transaction_id: str, db: Session = Depends(get_db)):
 
 @router.get("/{transaction_id}/download")
 def download_invoice(transaction_id: str, db: Session = Depends(get_db)):
-    transaction = db.query(Transaction).filter(
-        Transaction.id == transaction_id, Transaction.deleted_at.is_(None)
-    ).first()
-    if not transaction:
-        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND", "message": "Transaction not found"})
-
+    transaction = _get_transaction_or_404(db, transaction_id)
     service = InvoiceService()
     invoice = service.get_invoice(db, transaction, settings)
 

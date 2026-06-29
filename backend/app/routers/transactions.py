@@ -26,6 +26,8 @@ def export_transactions(
     db: Session = Depends(get_db),
 ):
     """Export transactions as CSV with UTF-8 BOM."""
+    from fastapi.responses import PlainTextResponse
+
     service = TransactionService()
     transactions, _total = service.list(db, 1, 10000, None, from_date, to_date)
 
@@ -39,7 +41,11 @@ def export_transactions(
     for t in transactions:
         writer.writerow([t.date, t.description, t.amount, t.invoice_number, t.notes])
 
-    return output.getvalue()
+    return PlainTextResponse(
+        content=output.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=transactions.csv"},
+    )
 
 
 @router.get("", response_model=PaginatedResponse[TransactionResponse])
