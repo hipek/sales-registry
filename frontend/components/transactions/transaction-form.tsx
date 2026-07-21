@@ -44,7 +44,7 @@ export function TransactionForm({ initialData, onSubmit, submitLabel }: Transact
   const onFormSubmit = async (data: FormData) => {
     const amount = parseFloat(data.amount)
     if (isNaN(amount) || amount <= 0) {
-      setError("amount", { message: "Kwota musi być większa od 0" })
+      setError("amount", { message: "Amount must be greater than 0" })
       return
     }
     try {
@@ -63,38 +63,38 @@ export function TransactionForm({ initialData, onSubmit, submitLabel }: Transact
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       <div>
-        <Label htmlFor="date">Data</Label>
-        <Input id="date" type="date" {...register("date", { required: "Data jest wymagana" })} />
+        <Label htmlFor="date">Date</Label>
+        <Input id="date" type="date" {...register("date", { required: "Date is required" })} />
         {errors.date && <p className="text-sm text-destructive">{errors.date.message}</p>}
       </div>
 
       <div>
-        <Label htmlFor="description">Opis</Label>
+        <Label htmlFor="description">Description</Label>
         <Input id="description" {...register("description", {
-          required: "Opis jest wymagany",
-          maxLength: { value: 500, message: "Opis nie może mieć więcej niż 500 znaków" },
+          required: "Description is required",
+          maxLength: { value: 500, message: "Description cannot exceed 500 characters" },
         })} />
         {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
       </div>
 
       <div>
-        <Label htmlFor="amount">Kwota (PLN)</Label>
+        <Label htmlFor="amount">Amount (PLN)</Label>
         <Input id="amount" type="number" step="0.01" {...register("amount", {
-          required: "Kwota jest wymagana",
-          validate: (value) => parseFloat(value) > 0 || "Kwota musi być większa od 0",
+          required: "Amount is required",
+          validate: (value) => parseFloat(value) > 0 || "Amount must be greater than 0",
         })} />
         {errors.amount && <p className="text-sm text-destructive">{errors.amount.message}</p>}
       </div>
 
       <div>
-        <Label htmlFor="notes">Notatki (opcjonalne)</Label>
+        <Label htmlFor="notes">Notes (optional)</Label>
         <Input id="notes" {...register("notes")} />
       </div>
 
       <div className="flex gap-2">
         <Button type="submit">{submitLabel}</Button>
         <Button type="button" variant="outline" onClick={() => router.back()}>
-          Anuluj
+          Cancel
         </Button>
       </div>
     </form>

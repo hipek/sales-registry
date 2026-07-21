@@ -1,10 +1,10 @@
 import { z } from "zod"
 
 export const transactionSchema = z.object({
-  date: z.string().min(1, "Data jest wymagana"),
-  description: z.string().min(1, "Opis jest wymagany").max(500, "Opis nie może mieć więcej niż 500 znaków"),
+  date: z.string().min(1, "Date is required"),
+  description: z.string().min(1, "Description is required").max(500, "Description cannot exceed 500 characters"),
   amount: z.string().transform((val) => parseFloat(val)).pipe(
-    z.number().min(0.01, "Kwota musi być większa od 0")
+    z.number().min(0.01, "Amount must be greater than 0")
   ),
   notes: z.string().optional(),
 })

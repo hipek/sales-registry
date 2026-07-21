@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 const navLinks = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/transactions", label: "Transakcje", icon: ArrowLeftRight },
+  { href: "/transactions", label: "Transactions", icon: ArrowLeftRight },
 ]
 
 export default function RootLayout({
@@ -22,13 +22,13 @@ export default function RootLayout({
   const pathname = usePathname()
 
   return (
-    <html lang="pl">
+    <html lang="en">
       <body className={cn(inter.className, "min-h-screen bg-background antialiased")}>
         <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
           <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold text-foreground">
               <Receipt className="h-5 w-5 text-primary" />
-              <span>Ewidencja 3D</span>
+              <span>3D Receipt Register</span>
             </Link>
             <nav className="flex items-center gap-1">
               {navLinks.map((link) => {

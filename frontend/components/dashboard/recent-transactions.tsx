@@ -20,10 +20,10 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
   return (
     <Card className="h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-        <CardTitle className="text-base">Ostatnie transakcje</CardTitle>
+        <CardTitle className="text-base">Recent transactions</CardTitle>
         <Button variant="ghost" size="sm" className="gap-1 text-xs" asChild>
           <Link href="/transactions">
-            Wszystkie <ArrowRight className="h-3 w-3" />
+            All <ArrowRight className="h-3 w-3" />
           </Link>
         </Button>
       </CardHeader>
@@ -31,9 +31,9 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
         {transactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <Receipt className="h-10 w-10 text-muted-foreground/40" />
-            <p className="mt-2 text-sm text-muted-foreground">Brak transakcji</p>
+            <p className="mt-2 text-sm text-muted-foreground">No transactions</p>
             <Button variant="outline" size="sm" className="mt-3" asChild>
-              <Link href="/transactions/new">Dodaj pierwszą</Link>
+              <Link href="/transactions/new">Add first</Link>
             </Button>
           </div>
         ) : (

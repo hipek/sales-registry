@@ -28,19 +28,19 @@ export function Dashboard({ limit, transactions }: DashboardProps) {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Podsumowanie sprzedaży dla działalności nierejestrowanej
+            Sales summary for non-registered business
           </p>
         </div>
         <Button asChild>
           <Link href="/transactions/new">
-            <Plus className="mr-2 h-4 w-4" /> Dodaj transakcję
+            <Plus className="mr-2 h-4 w-4" /> Add transaction
           </Link>
         </Button>
       </div>
 
       {limit.is_exceeded && (
         <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200">
-          <span className="font-semibold">⚠️ Przekroczyłeś limit kwartalny!</span> Osiągnięto {limit.used.toFixed(2)} PLN z {limit.limit.toFixed(2)} PLN.
+          <span className="font-semibold">⚠️ Quarterly limit exceeded!</span> Reached {limit.used.toFixed(2)} PLN of {limit.limit.toFixed(2)} PLN.
         </div>
       )}
 

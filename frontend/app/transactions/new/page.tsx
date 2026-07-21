@@ -17,20 +17,20 @@ export default function NewTransactionPage() {
         notes: data.notes,
       })
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Wystąpił błąd")
+      setError(e instanceof Error ? e.message : "An error occurred")
       throw e // re-throw to prevent navigation
     }
   }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Dodaj transakcję</h1>
+      <h1 className="text-2xl font-bold">Add transaction</h1>
       {error && (
         <div className="p-4 bg-red-100 border border-red-300 rounded-md text-red-800">
           {error}
         </div>
       )}
-      <TransactionForm onSubmit={handleSubmit} submitLabel="Dodaj" />
+      <TransactionForm onSubmit={handleSubmit} submitLabel="Add" />
     </div>
   )
 }

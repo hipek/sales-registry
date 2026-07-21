@@ -34,19 +34,19 @@ export function InvoicePreview({ invoice, transactionId }: InvoicePreviewProps) 
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild>
             <Link href={`/transactions/${transactionId}`}>
-              <ArrowLeft className="mr-1 h-4 w-4" /> Powrót
+              <ArrowLeft className="mr-1 h-4 w-4" /> Back
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Paragon {invoice.invoice_number}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Receipt {invoice.invoice_number}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Sprzedaż nierejestrowana
+              Non-registered sales
             </p>
           </div>
         </div>
         <Button size="sm" asChild>
           <a href={`/api/invoices/${transactionId}/download`}>
-            <Download className="mr-2 h-4 w-4" /> Pobierz PDF
+            <Download className="mr-2 h-4 w-4" /> Download PDF
           </a>
         </Button>
       </div>
@@ -67,11 +67,11 @@ export function InvoicePreview({ invoice, transactionId }: InvoicePreviewProps) 
         <CardContent className="space-y-4 pt-4">
           <div className="flex gap-6 text-sm">
             <div>
-              <span className="text-muted-foreground">Paragon nr:</span>{" "}
+              <span className="text-muted-foreground">Receipt no.:</span>{" "}
               <strong className="tabular-nums">{invoice.invoice_number}</strong>
             </div>
             <div>
-              <span className="text-muted-foreground">Data wystawienia:</span>{" "}
+              <span className="text-muted-foreground">Issue date:</span>{" "}
               <strong>{invoice.issue_date}</strong>
             </div>
           </div>
@@ -80,10 +80,10 @@ export function InvoicePreview({ invoice, transactionId }: InvoicePreviewProps) 
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/30">
-                  <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Towar/usługa</th>
-                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Ilość</th>
-                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Cena jedn.</th>
-                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Razem</th>
+                  <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Service</th>
+                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Qty</th>
+                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Unit price</th>
+                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -98,7 +98,7 @@ export function InvoicePreview({ invoice, transactionId }: InvoicePreviewProps) 
               </tbody>
               <tfoot>
                 <tr className="border-t bg-muted/20">
-                  <td colSpan={3} className="px-4 py-3 text-right text-sm font-semibold">RAZEM:</td>
+                  <td colSpan={3} className="px-4 py-3 text-right text-sm font-semibold">TOTAL:</td>
                   <td className="px-4 py-3 text-right text-base font-bold tabular-nums text-primary">
                     {formatPLN(invoice.total)}
                   </td>
@@ -109,7 +109,7 @@ export function InvoicePreview({ invoice, transactionId }: InvoicePreviewProps) 
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground border-t pt-3">
             <FileText className="h-3.5 w-3.5" />
-            Paragon wystawiony dla działalności nierejestrowanej — bez NIP nabywcy
+            Receipt issued for non-registered business — no buyer NIP
           </div>
         </CardContent>
       </Card>

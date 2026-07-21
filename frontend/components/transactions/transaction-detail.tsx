@@ -18,10 +18,10 @@ interface TransactionDetailProps {
 
 export function TransactionDetail({ transaction }: TransactionDetailProps) {
   const details = [
-    { icon: Calendar, label: "Data", value: formatDate(transaction.date) },
-    { icon: Tag, label: "Kwota", value: formatPLN(transaction.amount), highlight: true },
-    { icon: FileDigit, label: "Nr paragonu", value: transaction.invoice_number || "—" },
-    { icon: StickyNote, label: "Notatki", value: transaction.notes || "—" },
+    { icon: Calendar, label: "Date", value: formatDate(transaction.date) },
+    { icon: Tag, label: "Amount", value: formatPLN(transaction.amount), highlight: true },
+    { icon: FileDigit, label: "Receipt no.", value: transaction.invoice_number || "—" },
+    { icon: StickyNote, label: "Notes", value: transaction.notes || "—" },
   ]
 
   return (
@@ -29,10 +29,10 @@ export function TransactionDetail({ transaction }: TransactionDetailProps) {
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/transactions">
-            <ArrowLeft className="mr-1 h-4 w-4" /> Powrót
+            <ArrowLeft className="mr-1 h-4 w-4" /> Back
           </Link>
         </Button>
-        <h1 className="text-2xl font-bold tracking-tight">Szczegóły transakcji</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Transaction details</h1>
       </div>
 
       <Card>
@@ -55,12 +55,12 @@ export function TransactionDetail({ transaction }: TransactionDetailProps) {
       <div className="flex flex-wrap gap-2">
         <Button asChild>
           <Link href={`/invoices/${transaction.id}`}>
-            <FileText className="mr-2 h-4 w-4" /> Paragon
+            <FileText className="mr-2 h-4 w-4" /> Receipt
           </Link>
         </Button>
         <Button variant="outline" asChild>
           <Link href={`/transactions/${transaction.id}/edit`}>
-            <Edit className="mr-2 h-4 w-4" /> Edytuj
+            <Edit className="mr-2 h-4 w-4" /> Edit
           </Link>
         </Button>
       </div>

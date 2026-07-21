@@ -19,8 +19,8 @@ export default function InvoicePage({ params }: InvoicePageProps) {
     })
   }, [params.id])
 
-  if (loading) return <div className="p-8">Ładowanie...</div>
-  if (!invoice) return <div className="p-8">Nie znaleziono faktury</div>
+  if (loading) return <div className="p-8">Loading...</div>
+  if (!invoice) return <div className="p-8">Invoice not found</div>
 
   return <InvoicePreview invoice={invoice} transactionId={params.id} />
 }

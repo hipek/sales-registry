@@ -27,12 +27,12 @@ export default function TransactionsPage() {
   }, [fetchData])
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Czy na pewno chcesz usunąć tę transakcję?")) return
+    if (!confirm("Are you sure you want to delete this transaction?")) return
     await api.delete(`/api/transactions/${id}`)
     fetchData()
   }
 
-  if (loading && !data) return <div className="p-8">Ładowanie...</div>
+  if (loading && !data) return <div className="p-8">Loading...</div>
 
   return (
     <TransactionList
