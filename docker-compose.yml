@@ -9,6 +9,12 @@ services:
       - .env
     volumes:
       - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
     restart: unless-stopped
 
   frontend:
@@ -22,5 +28,6 @@ services:
       - NEXT_PUBLIC_API_URL=http://backend:8000
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     restart: unless-stopped
