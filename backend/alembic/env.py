@@ -29,7 +29,11 @@ def run_migrations_offline():
 def run_migrations_online():
     connectable = create_engine(config.get_main_option("sqlalchemy.url"))
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            render_as_batch=True,  # Needed for SQLite ALTER TABLE
+        )
         with context.begin_transaction():
             context.run_migrations()
 

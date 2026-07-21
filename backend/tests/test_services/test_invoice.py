@@ -16,6 +16,7 @@ class FakeSettings:
     seller_name = "Jan Kowalski"
     seller_address = "ul. Testowa 1, 00-001 Warszawa"
     seller_nip = "1234567890"
+    receipt_unit = "szt."
 
 
 def test_get_invoice_new(db_session: Session):
@@ -89,6 +90,7 @@ def test_get_invoice_no_nip(db_session: Session):
         seller_name = "Jan Kowalski"
         seller_address = "ul. Testowa 1"
         seller_nip = None
+        receipt_unit = "szt."
 
     svc = TransactionService()
     txn = svc.create(db_session, TransactionCreate(date=date(2026, 6, 1), description="No NIP", amount=10.0))

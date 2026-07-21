@@ -59,6 +59,20 @@ def test_download_invoice_pdf(client: TestClient, db_session):
     assert ".pdf" in resp.headers["content-disposition"]
 
 
+def test_download_invoice_pdf_content(client: TestClient, db_session):
+    svc = TransactionService()
+    txn = svc.create(db_session, TransactionCreate(
+        date=date(2026, 7, 15),
+        description="PDF content test",
+        amount=123.45,
+    ))
+
+    resp = client.get(f"/api/invoices/{txn.id}/download")
+    assert resp.status_code == 200
+    assert resp.content[:5] == b"%PDF-"
+    assert len(resp.content) > 500
+
+
 def test_download_invoice_not_found(client: TestClient, db_session):
     resp = client.get("/api/invoices/nonexistent/download")
     assert resp.status_code == 404

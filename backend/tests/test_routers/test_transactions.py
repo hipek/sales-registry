@@ -177,3 +177,16 @@ def test_export_csv(client: TestClient, db_session):
     assert resp.headers["content-type"] == "text/csv; charset=utf-8"
     assert "CSV test" in resp.text
     assert "99.99" in resp.text
+
+
+def test_export_csv_date_filter(client: TestClient, db_session):
+    svc = TransactionService()
+    svc.create(db_session, TransactionCreate(date=date(2026, 7, 1), description="Early", amount=10.0))
+    svc.create(db_session, TransactionCreate(date=date(2026, 7, 15), description="Middle", amount=20.0))
+    svc.create(db_session, TransactionCreate(date=date(2026, 8, 1), description="Late", amount=30.0))
+
+    resp = client.get("/api/transactions/export?from_date=2026-07-10&to_date=2026-07-31")
+    assert resp.status_code == 200
+    assert "Middle" in resp.text
+    assert "Early" not in resp.text
+    assert "Late" not in resp.text

@@ -13,6 +13,7 @@ class ReceiptSettings(Protocol):
     seller_name: str
     seller_address: str
     seller_nip: Optional[str]
+    receipt_unit: str
 
 
 class InvoiceService:
@@ -48,7 +49,7 @@ class InvoiceService:
         item = InvoiceItem(
             description=transaction.description,
             quantity=1,
-            unit="szt.",
+            unit=settings.receipt_unit,
             unit_price=transaction.amount,
             total=transaction.amount,
         )
