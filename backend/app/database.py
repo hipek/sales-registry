@@ -1,13 +1,20 @@
+from functools import lru_cache
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.config import settings
 
-engine = create_engine(
-    settings.database_url,
-    connect_args={"check_same_thread": False},  # SQLite-specific
-)
-SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+
+@lru_cache(maxsize=1)
+def get_engine():
+    return create_engine(
+        settings.database_url,
+        connect_args={"check_same_thread": False},  # SQLite-specific
+    )
+
+
+SessionLocal = sessionmaker(bind=get_engine(), autocommit=False, autoflush=False)
 
 
 def get_db():

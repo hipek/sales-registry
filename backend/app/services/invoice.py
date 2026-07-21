@@ -1,3 +1,5 @@
+from typing import Optional, Protocol
+
 from sqlalchemy.orm import Session
 
 from app.models.transaction import Transaction
@@ -5,9 +7,17 @@ from app.models.counter import Counter
 from app.schemas.invoice import InvoiceResponse, SellerInfo, InvoiceItem
 
 
+class ReceiptSettings(Protocol):
+    """Minimal contract for settings used in receipt generation."""
+    receipt_prefix: str
+    seller_name: str
+    seller_address: str
+    seller_nip: Optional[str]
+
+
 class InvoiceService:
     @staticmethod
-    def get_or_create_invoice(db: Session, transaction: Transaction, settings) -> InvoiceResponse:
+    def get_or_create_invoice(db: Session, transaction: Transaction, settings: ReceiptSettings) -> InvoiceResponse:
         # Reuse existing invoice_number if already assigned
         if transaction.invoice_number:
             invoice_number = transaction.invoice_number

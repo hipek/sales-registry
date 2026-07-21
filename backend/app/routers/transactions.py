@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.schemas.transaction import TransactionCreate, TransactionUpdate, TransactionResponse
 from app.schemas.common import PaginatedResponse, ErrorResponse
 from app.services.transaction import TransactionService
+from app.services.export import export_transactions_csv
 
 router = APIRouter()
 
@@ -26,23 +28,9 @@ def export_transactions(
     db: Session = Depends(get_db),
 ):
     """Export transactions as CSV with UTF-8 BOM."""
-    from fastapi.responses import PlainTextResponse
-
-    service = TransactionService()
-    transactions, _total = service.list(db, 1, 10000, None, from_date, to_date)
-
-    import csv
-    from io import StringIO
-
-    output = StringIO()
-    output.write("\ufeff")  # UTF-8 BOM for Excel
-    writer = csv.writer(output)
-    writer.writerow(["date", "description", "amount", "invoice_number", "notes"])
-    for t in transactions:
-        writer.writerow([t.date, t.description, t.amount, t.invoice_number, t.notes])
-
+    csv_content = export_transactions_csv(db, from_date, to_date)
     return PlainTextResponse(
-        content=output.getvalue(),
+        content=csv_content,
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=transactions.csv"},
     )
