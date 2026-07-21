@@ -1,4 +1,4 @@
-.PHONY: start stop build logs clean dev dev-backend dev-frontend test test-backend test-frontend
+.PHONY: start stop build logs clean dev dev-backend dev-frontend test test-backend test-frontend init
 
 start:
 	docker compose up -d
@@ -19,6 +19,10 @@ clean:
 	docker compose down -v
 	rm -rf ./data
 	@echo "✅ Cleaned"
+
+init:
+	docker compose run --rm backend uv run alembic upgrade head
+	@echo "✅ Database initialized"
 
 restart: stop start
 
