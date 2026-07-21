@@ -17,7 +17,7 @@ logs:
 
 clean:
 	docker compose down --rmi all --volumes
-	rm -rf ./data
+	rm -f ./data/*.db ./data/*.sqlite3 ./data/*.sqlite
 	@echo "✅ Containers, images, and database removed"
 
 init:
