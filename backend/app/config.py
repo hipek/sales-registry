@@ -12,8 +12,13 @@ class Settings(BaseSettings):
     quarterly_limit: float = 10813.50
     receipt_prefix: str = "R"
     receipt_unit: str = "szt."
+    cors_origins: str = "http://localhost:3000"
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR.parent / ".env"),
