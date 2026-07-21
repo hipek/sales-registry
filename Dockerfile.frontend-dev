@@ -1,0 +1,12 @@
+FROM node:20-alpine
+
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+WORKDIR /app
+
+# Install deps first (layer cached until package.json changes)
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Source code mounted at runtime
+CMD ["pnpm", "dev"]

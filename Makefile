@@ -1,11 +1,11 @@
 .PHONY: start stop build logs clean dev dev-backend dev-frontend test test-backend test-frontend init
 
 start:
-	docker compose up -d
+	docker compose up -d backend-dev frontend-dev
 	@echo "✅ App at http://localhost:3000"
 
 stop:
-	docker compose down
+	docker compose stop backend-dev frontend-dev
 	@echo "✅ Stopped"
 
 build:
@@ -25,6 +25,7 @@ init:
 	@echo "✅ Database initialized"
 
 restart: stop start
+	@echo "✅ Restarted"
 
 dev-backend:
 	cd backend && uv run uvicorn app.main:app --reload
@@ -33,9 +34,7 @@ dev-frontend:
 	cd frontend && pnpm dev
 
 dev:
-	@echo "Run in separate terminals:"
-	@echo "  make dev-backend"
-	@echo "  make dev-frontend"
+	@echo "Use 'make start' to run both backend + frontend in dev mode"
 
 test: test-backend test-frontend
 	@echo "✅ All tests passed"
