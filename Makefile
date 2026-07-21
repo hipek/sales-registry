@@ -16,9 +16,9 @@ logs:
 	docker compose logs -f
 
 clean:
-	docker compose down -v
+	docker compose down --rmi all --volumes
 	rm -rf ./data
-	@echo "✅ Cleaned"
+	@echo "✅ Containers, images, and database removed"
 
 init:
 	docker compose run --rm backend uv run alembic upgrade head
