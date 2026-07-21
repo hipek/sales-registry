@@ -10,12 +10,13 @@ class LimitService:
     @staticmethod
     def get_current(db: Session, quarterly_limit: float) -> QuarterlyLimitResponse:
         year, quarter = get_current_quarter()
-        start_date, _end_date = get_quarter_date_range(year, quarter)
+        start_date, end_date = get_quarter_date_range(year, quarter)
 
         used = (
             db.query(func.coalesce(func.sum(Transaction.amount), 0))
             .filter(
                 Transaction.date >= start_date.isoformat(),
+                Transaction.date <= end_date.isoformat(),
                 Transaction.deleted_at.is_(None),
             )
             .scalar()

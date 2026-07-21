@@ -71,6 +71,8 @@ class TransactionService:
             return None
 
         update_data = data.model_dump(exclude_unset=True)
+        if "date" in update_data:
+            update_data["date"] = update_data["date"].isoformat()
         for key, value in update_data.items():
             setattr(transaction, key, value)
         transaction.updated_at = datetime.now(UTC)
