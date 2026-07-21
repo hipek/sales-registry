@@ -32,8 +32,8 @@ interface TransactionListProps {
   transactions: Transaction[]
   meta: PaginationMeta
   search: string
-  from_date: string
-  to_date: string
+  fromDate: string
+  toDate: string
   onSearch: (val: string) => void
   onDateFilter: (from: string, to: string) => void
   onDelete: (id: string) => void
@@ -43,7 +43,10 @@ export function TransactionList({
   transactions,
   meta,
   search,
+  fromDate,
+  toDate,
   onSearch,
+  onDateFilter,
   onDelete,
 }: TransactionListProps) {
   return (
@@ -64,12 +67,26 @@ export function TransactionList({
         </div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <Input
           placeholder="Szukaj opisu..."
           value={search}
           onChange={(e) => onSearch(e.target.value)}
           className="max-w-xs"
+        />
+        <Input
+          type="date"
+          value={fromDate}
+          onChange={(e) => onDateFilter(e.target.value, toDate)}
+          className="w-40"
+          title="Od daty"
+        />
+        <Input
+          type="date"
+          value={toDate}
+          onChange={(e) => onDateFilter(fromDate, e.target.value)}
+          className="w-40"
+          title="Do daty"
         />
       </div>
 
