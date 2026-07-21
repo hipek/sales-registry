@@ -43,8 +43,10 @@ class TransactionService:
         query = db.query(Transaction).filter(Transaction.deleted_at.is_(None))
 
         if search:
+            # Escape LIKE metacharacters to prevent pattern injection
+            escaped = search.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
             query = query.filter(
-                Transaction.description.ilike(f"%{search}%")
+                Transaction.description.ilike(f"%{escaped}%", escape='\\')
             )
         if from_date:
             query = query.filter(Transaction.date >= from_date)
