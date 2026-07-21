@@ -24,7 +24,7 @@ def _get_transaction_or_404(db: Session, transaction_id: str):
 def get_invoice(transaction_id: str, db: Session = Depends(get_db)):
     transaction = _get_transaction_or_404(db, transaction_id)
     service = InvoiceService()
-    invoice = service.get_invoice(db, transaction, settings)
+    invoice = service.get_or_create_invoice(db, transaction, settings)
     return invoice
 
 
@@ -32,7 +32,7 @@ def get_invoice(transaction_id: str, db: Session = Depends(get_db)):
 def download_invoice(transaction_id: str, db: Session = Depends(get_db)):
     transaction = _get_transaction_or_404(db, transaction_id)
     service = InvoiceService()
-    invoice = service.get_invoice(db, transaction, settings)
+    invoice = service.get_or_create_invoice(db, transaction, settings)
 
     pdf_bytes = generate_receipt_pdf(
         invoice_number=invoice.invoice_number,

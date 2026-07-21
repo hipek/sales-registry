@@ -113,7 +113,7 @@ def test_get_transaction_not_found(client: TestClient, db_session):
     resp = client.get("/api/transactions/nonexistent-id")
     assert resp.status_code == 404
     data = resp.json()
-    assert data["detail"]["code"] == "NOT_FOUND"
+    assert data["error"]["code"] == "NOT_FOUND"
 
 
 def test_update_transaction(client: TestClient, db_session):

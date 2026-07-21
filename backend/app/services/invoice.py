@@ -7,7 +7,7 @@ from app.schemas.invoice import InvoiceResponse, SellerInfo, InvoiceItem
 
 class InvoiceService:
     @staticmethod
-    def get_invoice(db: Session, transaction: Transaction, settings) -> InvoiceResponse:
+    def get_or_create_invoice(db: Session, transaction: Transaction, settings) -> InvoiceResponse:
         # Reuse existing invoice_number if already assigned
         if transaction.invoice_number:
             invoice_number = transaction.invoice_number

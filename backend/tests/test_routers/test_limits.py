@@ -21,8 +21,8 @@ def test_get_current_limit_no_transactions(client: TestClient, db_session):
 
 def test_get_current_limit_with_usage(client: TestClient, db_session):
     svc = TransactionService()
-    svc.create(db_session, TransactionCreate(date=date(2026, 6, 1), description="Sale 1", amount=1000.0))
-    svc.create(db_session, TransactionCreate(date=date(2026, 6, 15), description="Sale 2", amount=500.50))
+    svc.create(db_session, TransactionCreate(date=date(2026, 7, 1), description="Sale 1", amount=1000.0))
+    svc.create(db_session, TransactionCreate(date=date(2026, 7, 15), description="Sale 2", amount=500.50))
 
     resp = client.get("/api/limits/current")
     assert resp.status_code == 200
@@ -34,7 +34,7 @@ def test_get_current_limit_with_usage(client: TestClient, db_session):
 
 def test_get_current_limit_exceeded(client: TestClient, db_session):
     svc = TransactionService()
-    svc.create(db_session, TransactionCreate(date=date(2026, 6, 1), description="Big sale", amount=12000.0))
+    svc.create(db_session, TransactionCreate(date=date(2026, 7, 1), description="Big sale", amount=12000.0))
 
     resp = client.get("/api/limits/current")
     assert resp.status_code == 200

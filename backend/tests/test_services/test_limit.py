@@ -9,7 +9,7 @@ from app.services.transaction import TransactionService
 from app.schemas.transaction import TransactionCreate
 
 
-def _create_txn(db: Session, day: int, amount: float, month: int = 6):
+def _create_txn(db: Session, day: int, amount: float, month: int = 7):
     svc = TransactionService()
     svc.create(db, TransactionCreate(
         date=date(2026, month, day),
@@ -61,7 +61,7 @@ def test_get_current_excludes_soft_deleted(db_session: Session):
     # Create then soft-delete a transaction
     txn_svc = TransactionService()
     txn = txn_svc.create(db_session, TransactionCreate(
-        date=date(2026, 6, 2),
+        date=date(2026, 7, 2),
         description="To delete",
         amount=5000.0,
     ))

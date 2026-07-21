@@ -27,7 +27,7 @@ def test_get_invoice_new(db_session: Session):
     ))
 
     inv_svc = InvoiceService()
-    invoice = inv_svc.get_invoice(db_session, txn, FakeSettings())
+    invoice = inv_svc.get_or_create_invoice(db_session, txn, FakeSettings())
 
     assert invoice.invoice_number == "R/2026/001"
     assert invoice.issue_date == "2026-06-15"
@@ -50,8 +50,8 @@ def test_get_invoice_increments_counter(db_session: Session):
     txn2 = svc.create(db_session, TransactionCreate(date=date(2026, 6, 2), description="Second", amount=20.0))
 
     inv_svc = InvoiceService()
-    inv1 = inv_svc.get_invoice(db_session, txn1, FakeSettings())
-    inv2 = inv_svc.get_invoice(db_session, txn2, FakeSettings())
+    inv1 = inv_svc.get_or_create_invoice(db_session, txn1, FakeSettings())
+    inv2 = inv_svc.get_or_create_invoice(db_session, txn2, FakeSettings())
 
     assert inv1.invoice_number == "R/2026/001"
     assert inv2.invoice_number == "R/2026/002"
@@ -62,11 +62,11 @@ def test_get_invoice_existing_number(db_session: Session):
     txn = svc.create(db_session, TransactionCreate(date=date(2026, 6, 1), description="Test", amount=50.0))
 
     inv_svc = InvoiceService()
-    inv1 = inv_svc.get_invoice(db_session, txn, FakeSettings())
+    inv1 = inv_svc.get_or_create_invoice(db_session, txn, FakeSettings())
     assert inv1.invoice_number == "R/2026/001"
 
     # Second call should reuse existing number
-    inv2 = inv_svc.get_invoice(db_session, txn, FakeSettings())
+    inv2 = inv_svc.get_or_create_invoice(db_session, txn, FakeSettings())
     assert inv2.invoice_number == "R/2026/001"
 
 
@@ -76,8 +76,8 @@ def test_get_invoice_separate_years(db_session: Session):
     txn_2026 = svc.create(db_session, TransactionCreate(date=date(2026, 1, 1), description="New", amount=20.0))
 
     inv_svc = InvoiceService()
-    inv_2025 = inv_svc.get_invoice(db_session, txn_2025, FakeSettings())
-    inv_2026 = inv_svc.get_invoice(db_session, txn_2026, FakeSettings())
+    inv_2025 = inv_svc.get_or_create_invoice(db_session, txn_2025, FakeSettings())
+    inv_2026 = inv_svc.get_or_create_invoice(db_session, txn_2026, FakeSettings())
 
     assert inv_2025.invoice_number == "R/2025/001"
     assert inv_2026.invoice_number == "R/2026/001"
@@ -94,6 +94,6 @@ def test_get_invoice_no_nip(db_session: Session):
     txn = svc.create(db_session, TransactionCreate(date=date(2026, 6, 1), description="No NIP", amount=10.0))
 
     inv_svc = InvoiceService()
-    invoice = inv_svc.get_invoice(db_session, txn, NoNipSettings())
+    invoice = inv_svc.get_or_create_invoice(db_session, txn, NoNipSettings())
 
     assert invoice.seller.nip is None

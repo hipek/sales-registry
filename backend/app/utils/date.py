@@ -1,3 +1,4 @@
+import calendar
 from datetime import date
 
 
@@ -12,4 +13,5 @@ def get_quarter_date_range(year: int, quarter: int) -> tuple[date, date]:
     """Return (start_date, end_date) for a given year/quarter."""
     start_month = (quarter - 1) * 3 + 1
     end_month = start_month + 2
-    return date(year, start_month, 1), date(year, end_month, 28)  # 28 covers all months
+    _, last_day = calendar.monthrange(year, end_month)
+    return date(year, start_month, 1), date(year, end_month, last_day)
