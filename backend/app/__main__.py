@@ -1,4 +1,3 @@
-"""Entry point that reads host/port from settings."""
 import uvicorn
 
 from app.config import settings

@@ -12,7 +12,6 @@ class LimitService:
         year, quarter = get_current_quarter()
         start_date, _end_date = get_quarter_date_range(year, quarter)
 
-        # Sum amounts for current quarter
         used = (
             db.query(func.coalesce(func.sum(Transaction.amount), 0))
             .filter(

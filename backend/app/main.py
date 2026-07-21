@@ -18,9 +18,6 @@ app.add_middleware(
 )
 
 
-# ---------------------------------------------------------------------------
-# Standardized error responses
-# ---------------------------------------------------------------------------
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(
@@ -74,9 +71,6 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
-# ---------------------------------------------------------------------------
-# Routers
-# ---------------------------------------------------------------------------
 app.include_router(transactions_router, prefix="/api/transactions")
 app.include_router(limits_router, prefix="/api/limits")
 app.include_router(invoices_router, prefix="/api/invoices")

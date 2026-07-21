@@ -1,4 +1,3 @@
-"""Tests for transaction API endpoints."""
 from datetime import date, UTC, datetime
 import uuid
 
@@ -159,7 +158,6 @@ def test_delete_transaction(client: TestClient, db_session):
     resp = client.delete(f"/api/transactions/{txn.id}")
     assert resp.status_code == 204
 
-    # Verify soft-deleted
     assert svc.get_by_id(db_session, txn.id) is None
 
 

@@ -19,11 +19,9 @@ class ReceiptSettings(Protocol):
 class InvoiceService:
     @staticmethod
     def get_or_create_invoice(db: Session, transaction: Transaction, settings: ReceiptSettings) -> InvoiceResponse:
-        # Reuse existing invoice_number if already assigned
         if transaction.invoice_number:
             invoice_number = transaction.invoice_number
         else:
-            # Generate new invoice number
             year = transaction.date[:4]
             counter_id = f"receipt-{year}"
             counter = db.query(Counter).filter(Counter.id == counter_id).first()
@@ -36,7 +34,6 @@ class InvoiceService:
             counter.value += 1
             invoice_number = f"{settings.receipt_prefix}/{year}/{counter.value:03d}"
 
-            # Persist invoice_number on transaction
             transaction.invoice_number = invoice_number
             db.commit()
 

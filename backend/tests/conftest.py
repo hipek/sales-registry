@@ -1,4 +1,3 @@
-"""Shared fixtures for backend tests."""
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
@@ -12,10 +11,6 @@ from app.main import app
 
 @pytest.fixture
 def db_session():
-    """In-memory SQLite session for tests.
-
-    Uses StaticPool so all connections share the same in-memory DB.
-    """
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
@@ -32,7 +27,6 @@ def db_session():
 
 @pytest.fixture(autouse=True)
 def _test_settings():
-    """Set sensible defaults for settings used in tests."""
     from app.config import settings
 
     original_name = settings.seller_name
@@ -55,7 +49,6 @@ def _test_settings():
 
 @pytest.fixture
 def client(db_session):
-    """TestClient with overridden DB dependency."""
 
     def override_get_db():
         yield db_session

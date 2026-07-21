@@ -1,4 +1,3 @@
-"""Tests for TransactionService."""
 from datetime import date, datetime, UTC
 
 import pytest
@@ -79,12 +78,10 @@ def test_list_pagination(db_session: Session):
             amount=float(i + 1),
         ))
 
-    # Page 1, limit 2
     transactions, total = svc.list(db_session, page=1, limit=2)
     assert len(transactions) == 2
     assert total == 5
 
-    # Page 3, limit 2
     transactions, total = svc.list(db_session, page=3, limit=2)
     assert len(transactions) == 1
     assert total == 5
@@ -134,7 +131,6 @@ def test_update_transaction(db_session: Session):
     assert updated is not None
     assert updated.description == "Updated"
     assert updated.amount == 200.0
-    # Date unchanged
     assert updated.date == "2026-06-01"
 
 
@@ -156,7 +152,6 @@ def test_delete_transaction(db_session: Session):
 
     assert svc.delete(db_session, txn.id) is True
 
-    # Verify soft delete
     db_session.refresh(txn)
     assert txn.deleted_at is not None
 

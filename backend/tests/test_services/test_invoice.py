@@ -1,4 +1,3 @@
-"""Tests for InvoiceService."""
 from datetime import date
 from unittest.mock import MagicMock
 
@@ -39,7 +38,6 @@ def test_get_invoice_new(db_session: Session):
     assert invoice.items[0].total == 89.99
     assert invoice.total == 89.99
 
-    # Counter should be incremented
     counter = db_session.query(Counter).filter(Counter.id == "receipt-2026").first()
     assert counter is not None
     assert counter.value == 1
@@ -66,7 +64,6 @@ def test_get_invoice_existing_number(db_session: Session):
     inv1 = inv_svc.get_or_create_invoice(db_session, txn, FakeSettings())
     assert inv1.invoice_number == "R/2026/001"
 
-    # Second call should reuse existing number
     inv2 = inv_svc.get_or_create_invoice(db_session, txn, FakeSettings())
     assert inv2.invoice_number == "R/2026/001"
 

@@ -1,4 +1,3 @@
-"""Tests for LimitService."""
 from datetime import date
 
 from sqlalchemy.orm import Session
@@ -58,7 +57,6 @@ def test_get_current_exceeded(db_session: Session):
 def test_get_current_excludes_soft_deleted(db_session: Session):
     _create_txn(db_session, 1, 1000.0)
 
-    # Create then soft-delete a transaction
     txn_svc = TransactionService()
     txn = txn_svc.create(db_session, TransactionCreate(
         date=date(2026, 7, 2),

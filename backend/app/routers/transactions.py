@@ -27,7 +27,6 @@ def export_transactions(
     to_date: str | None = Query(None),
     db: Session = Depends(get_db),
 ):
-    """Export transactions as CSV with UTF-8 BOM."""
     csv_content = export_transactions_csv(db, from_date, to_date)
     return PlainTextResponse(
         content=csv_content,

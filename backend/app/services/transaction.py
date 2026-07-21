@@ -40,7 +40,6 @@ class TransactionService:
         from_date: Optional[str] = None,
         to_date: Optional[str] = None,
     ) -> tuple[list[Transaction], int]:
-        """Return (transactions, total_count)."""
         query = db.query(Transaction).filter(Transaction.deleted_at.is_(None))
 
         if search:
