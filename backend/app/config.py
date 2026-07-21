@@ -1,4 +1,5 @@
 from pathlib import Path
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -6,8 +7,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Settings(BaseSettings):
     database_url: str
-    seller_name: str
-    seller_address: str
+    seller_name: str = Field(min_length=1)
+    seller_address: str = Field(min_length=1)
     seller_nip: str | None = None
     quarterly_limit: float = 10813.50
     receipt_prefix: str = "R"
