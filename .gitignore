@@ -11,3 +11,4 @@ backend/__pycache__/
 backend/.venv/
 *.pyc
 .DS_Store
+frontend/tsconfig.tsbuildinfo

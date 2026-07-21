@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     quarterly_limit: float = 10813.50
     receipt_prefix: str = "R"
     receipt_unit: str = "szt."
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = "http://localhost:3000,http://host.docker.internal:8000"
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000
 

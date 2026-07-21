@@ -45,7 +45,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://backend:8000
+      - NEXT_PUBLIC_API_URL=http://host.docker.internal:8000
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
     depends_on:
       backend:
@@ -63,9 +63,10 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://backend-dev:8000
+      - NEXT_PUBLIC_API_URL=http://host.docker.internal:8000
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
     depends_on:
       backend-dev:
         condition: service_healthy
     restart: unless-stopped
+
