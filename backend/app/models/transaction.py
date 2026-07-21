@@ -18,7 +18,7 @@ class Transaction(Base):
     invoice_number = Column(String, nullable=True)
     notes = Column(Text, nullable=True)
     deleted_at = Column(DateTime, nullable=True)  # Soft delete
-    created_at = Column(DateTime, nullable=False, default=datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
     updated_at = Column(
-        DateTime, nullable=False, default=datetime.now(UTC), onupdate=datetime.now(UTC)
+        DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
     )
