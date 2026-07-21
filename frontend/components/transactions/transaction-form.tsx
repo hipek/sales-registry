@@ -44,13 +44,17 @@ export function TransactionForm({ initialData, onSubmit, submitLabel }: Transact
   const onFormSubmit = async (data: FormData) => {
     const amount = parseFloat(data.amount)
     if (isNaN(amount) || amount <= 0) return
-    await onSubmit({
-      date: data.date,
-      description: data.description,
-      amount,
-      notes: data.notes,
-    })
-    router.push("/transactions")
+    try {
+      await onSubmit({
+        date: data.date,
+        description: data.description,
+        amount,
+        notes: data.notes,
+      })
+      router.push("/transactions")
+    } catch {
+      // Error handled by parent — do not navigate
+    }
   }
 
   return (
