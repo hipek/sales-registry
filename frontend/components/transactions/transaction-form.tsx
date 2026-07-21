@@ -27,7 +27,7 @@ interface TransactionFormProps {
 
 export function TransactionForm({ initialData, onSubmit, submitLabel }: TransactionFormProps) {
   const router = useRouter()
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, setError, formState: { errors } } = useForm<FormData>({
     defaultValues: initialData ? {
       date: initialData.date,
       description: initialData.description,
@@ -43,7 +43,10 @@ export function TransactionForm({ initialData, onSubmit, submitLabel }: Transact
 
   const onFormSubmit = async (data: FormData) => {
     const amount = parseFloat(data.amount)
-    if (isNaN(amount) || amount <= 0) return
+    if (isNaN(amount) || amount <= 0) {
+      setError("amount", { message: "Kwota musi być większa od 0" })
+      return
+    }
     try {
       await onSubmit({
         date: data.date,
