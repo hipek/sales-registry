@@ -24,4 +24,8 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    environment:
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+      BACKEND_API_URL: ${BACKEND_API_URL}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     restart: unless-stopped
