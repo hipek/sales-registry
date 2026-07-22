@@ -40,7 +40,7 @@ test: test-backend test-frontend
 	@echo "✅ All tests passed"
 
 test-backend:
-	docker compose run --rm -v ./backend/tests:/app/tests backend-dev sh -c "uv sync --frozen && uv run pytest"
+	docker compose run --rm -v ./backend/tests:/app/tests backend-dev sh -c "uv sync --frozen && uv run pytest -q"
 
 test-frontend:
 	docker compose run --rm --no-deps -v ./frontend:/app -w /app -e CI=true -e NODE_ENV=development frontend-dev sh -c "corepack enable && corepack prepare pnpm@9 --activate && pnpm install --frozen-lockfile && pnpm vitest run --passWithNoTests"
