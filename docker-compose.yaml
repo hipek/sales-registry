@@ -1,22 +1,4 @@
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
-    volumes:
-      - ./data:/app/data
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
-    restart: unless-stopped
-
   backend-dev:
     build:
       context: .
@@ -37,22 +19,6 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
-      - BACKEND_API_URL=http://host.docker.internal:8000
-      - NEXT_PUBLIC_APP_URL=http://localhost:3000
-    depends_on:
-      backend:
-        condition: service_healthy
-    restart: unless-stopped
-
   frontend-dev:
     build:
       context: .
@@ -71,4 +37,3 @@ services:
       backend-dev:
         condition: service_healthy
     restart: unless-stopped
-
