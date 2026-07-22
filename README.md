@@ -86,7 +86,10 @@ Optional:
 |----------|---------|-------------|
 | `QUARTERLY_LIMIT` | `10813.50` | Quarterly revenue limit (PLN) |
 | `RECEIPT_PREFIX` | `R` | Receipt number prefix |
+| `RECEIPT_UNIT` | `szt.` | Receipt unit (Polish for "pieces") |
 | `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | Public app URL |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Backend API URL (frontend) |
+| `CORS_ORIGINS` | `http://localhost:3000,http://host.docker.internal:8000` | Allowed CORS origins |
 | `BACKEND_HOST` | `0.0.0.0` | Uvicorn bind address |
 | `BACKEND_PORT` | `8000` | Uvicorn port |
 
