@@ -52,6 +52,10 @@ pnpm install      # Install deps
 pnpm run build    # Build Next.js
 ```
 
+## Coolify
+
+- App ID: `yayfxgjotwlkllhdu90x3tqk`
+
 ## Rules
 
 - Use `uv` for Python deps, `pnpm` for Node deps
