@@ -1,3 +1,4 @@
+from decimal import Decimal
 from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -10,7 +11,7 @@ class Settings(BaseSettings):
     seller_name: str = "Jan Kowalski"
     seller_address: str = "ul. Testowa 1, 00-001 Warszawa"
     seller_nip: str | None = None
-    quarterly_limit: float = 10813.50
+    quarterly_limit: Decimal = Decimal("10813.50")
     receipt_prefix: str = "R"
     receipt_unit: str = "szt."
     cors_origins: str = "http://localhost:3000,http://host.docker.internal:8000"

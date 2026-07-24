@@ -1,4 +1,6 @@
 import logging
+from decimal import Decimal
+from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -6,9 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-logger = logging.getLogger(__name__)
-
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 from app.routers import transactions_router, limits_router, invoices_router
 
 app = FastAPI(title="Ewidencja3D")
@@ -35,6 +37,16 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     )
 
 
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, Decimal):
+        return float(value)
+    if isinstance(value, dict):
+        return {k: _json_safe(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_json_safe(v) for v in value]
+    return value
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
@@ -43,7 +55,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "error": {
                 "code": "VALIDATION_ERROR",
                 "message": "Invalid request data",
-                "details": exc.errors(),
+                "details": _json_safe(exc.errors()),
             }
         },
     )

@@ -21,9 +21,9 @@ def test_get_current_no_transactions(db_session: Session):
     svc = LimitService()
     result = svc.get_current(db_session, 10813.50)
 
-    assert result.limit == 10813.50
-    assert result.used == 0.0
-    assert result.remaining == 10813.50
+    assert float(result.limit) == 10813.50
+    assert float(result.used) == 0.0
+    assert float(result.remaining) == 10813.50
     assert result.is_exceeded is False
     assert result.year is not None
     assert 1 <= result.quarter <= 4
@@ -37,8 +37,8 @@ def test_get_current_with_usage(db_session: Session):
     svc = LimitService()
     result = svc.get_current(db_session, 10813.50)
 
-    assert result.used == 1700.50
-    assert result.remaining == 9113.0
+    assert float(result.used) == 1700.50
+    assert float(result.remaining) == 9113.0
     assert result.is_exceeded is False
 
 
@@ -49,8 +49,8 @@ def test_get_current_exceeded(db_session: Session):
     svc = LimitService()
     result = svc.get_current(db_session, 10000.0)
 
-    assert result.used == 11000.0
-    assert result.remaining == 0.0
+    assert float(result.used) == 11000.0
+    assert float(result.remaining) == 0.0
     assert result.is_exceeded is True
 
 
@@ -68,4 +68,4 @@ def test_get_current_excludes_soft_deleted(db_session: Session):
     svc = LimitService()
     result = svc.get_current(db_session, 10813.50)
 
-    assert result.used == 1000.0
+    assert float(result.used) == 1000.0

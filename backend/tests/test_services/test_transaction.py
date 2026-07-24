@@ -1,4 +1,5 @@
 from datetime import date, datetime, UTC
+from decimal import Decimal
 
 import pytest
 from sqlalchemy.orm import Session
@@ -21,7 +22,7 @@ def test_create_transaction(db_session: Session):
     assert txn.id is not None
     assert txn.date == "2026-06-15"
     assert txn.description == "Test sale"
-    assert txn.amount == 100.50
+    assert txn.amount == Decimal("100.50")
     assert txn.notes == "Optional note"
     assert txn.deleted_at is None
 
@@ -130,7 +131,7 @@ def test_update_transaction(db_session: Session):
     updated = svc.update(db_session, txn.id, TransactionUpdate(description="Updated", amount=200.0))
     assert updated is not None
     assert updated.description == "Updated"
-    assert updated.amount == 200.0
+    assert updated.amount == Decimal("200.00")
     assert updated.date == "2026-06-01"
 
 
@@ -177,7 +178,7 @@ def test_to_response(db_session: Session):
     assert resp.id == txn.id
     assert resp.date == "2026-06-15"
     assert resp.description == "Response test"
-    assert resp.amount == 75.0
+    assert resp.amount == Decimal("75.00")
     assert resp.invoice_number is None
     assert resp.notes is None
     assert isinstance(resp.created_at, str)

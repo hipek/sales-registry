@@ -11,6 +11,7 @@ from app.utils.date import get_current_quarter, get_quarter_date_range
 class LimitService:
     @staticmethod
     def get_current(db: Session, quarterly_limit: Decimal) -> QuarterlyLimitResponse:
+        quarterly_limit = Decimal(str(quarterly_limit))
         year, quarter = get_current_quarter()
         start_date, end_date = get_quarter_date_range(year, quarter)
 
@@ -29,7 +30,7 @@ class LimitService:
         return QuarterlyLimitResponse(
             year=year,
             quarter=quarter,
-            limit=Decimal(str(quarterly_limit)),
+            limit=quarterly_limit,
             used=used,
             remaining=remaining,
             is_exceeded=used > quarterly_limit,

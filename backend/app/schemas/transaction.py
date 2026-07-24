@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import date
 from typing import Optional
 
@@ -20,6 +20,8 @@ class TransactionUpdate(BaseModel):
 
 
 class TransactionResponse(BaseModel):
+    model_config = ConfigDict(json_encoders={Decimal: float})
+
     id: str
     date: str
     description: str

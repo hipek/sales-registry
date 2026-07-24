@@ -12,6 +12,7 @@ from app.models import Base
 # Import all models so they are registered
 import app.models.transaction
 import app.models.counter
+import app.models.counter_lock
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)
