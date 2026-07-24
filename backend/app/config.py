@@ -1,11 +1,11 @@
+import os
 from decimal import Decimal
 from pathlib import Path
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-PROJECT_ROOT = BASE_DIR.parent
-DATA_DIR = PROJECT_ROOT / "data"
+DATA_DIR = Path(os.environ.get("DATA_DIR", str(BASE_DIR.parent / "data")))
 DATABASE_PATH = DATA_DIR / "database.sqlite"
 
 
