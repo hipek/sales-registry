@@ -1,7 +1,13 @@
+import re
+
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from io import BytesIO
+
+
+def sanitize_filename(name: str) -> str:
+    return re.sub(r"[^A-Za-z0-9._-]+", "_", name)
 
 
 def generate_receipt_pdf(

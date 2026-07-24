@@ -6,7 +6,7 @@ from app.database import get_db
 from app.schemas.invoice import InvoiceResponse
 from app.services.invoice import InvoiceService
 from app.services.transaction import TransactionService
-from app.utils.pdf import generate_receipt_pdf
+from app.utils.pdf import generate_receipt_pdf, sanitize_filename
 from app.config import settings
 
 router = APIRouter()
@@ -47,5 +47,5 @@ def download_invoice(transaction_id: str, db: Session = Depends(get_db)):
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename={invoice.invoice_number}.pdf"},
+        headers={"Content-Disposition": f"attachment; filename={sanitize_filename(invoice.invoice_number)}.pdf"},
     )
