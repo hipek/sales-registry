@@ -6,7 +6,7 @@ services:
     ports:
       - "8003:8000"
     environment:
-      DATABASE_URL: "${DATABASE_URL:-sqlite:///./data/database.sqlite}"
+      DATABASE_URL: "${DATABASE_URL:-sqlite:////app/data/database.sqlite}"
 
       QUARTERLY_LIMIT: "${QUARTERLY_LIMIT:-10813.50}"
       RECEIPT_PREFIX: "${RECEIPT_PREFIX:-R}"

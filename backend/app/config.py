@@ -1,9 +1,12 @@
 from decimal import Decimal
 from pathlib import Path
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = BASE_DIR.parent
+DATA_DIR = PROJECT_ROOT / "data"
+DATABASE_PATH = DATA_DIR / "database.sqlite"
 
 
 class Settings(BaseSettings):
@@ -21,6 +24,12 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @model_validator(mode="after")
+    def normalize_database_url(self) -> "Settings":
+        if self.database_url.startswith("sqlite:///./"):
+            self.database_url = f"sqlite:///{DATABASE_PATH}"
+        return self
 
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR.parent / ".env"),

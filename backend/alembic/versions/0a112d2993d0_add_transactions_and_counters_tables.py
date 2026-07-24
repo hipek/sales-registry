@@ -29,7 +29,7 @@ def upgrade() -> None:
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('date', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=False),
-    sa.Column('amount', sa.Float(), nullable=False),
+    sa.Column('amount', sa.Numeric(precision=12, scale=2), nullable=False),
     sa.Column('invoice_number', sa.String(), nullable=True),
     sa.Column('notes', sa.Text(), nullable=True),
     sa.Column('deleted_at', sa.DateTime(), nullable=True),
