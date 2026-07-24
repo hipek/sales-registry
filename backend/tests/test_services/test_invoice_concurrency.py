@@ -69,19 +69,21 @@ def test_concurrent_invoice_creation(tmp_path: Path):
                     zip(sessions, transaction_ids, strict=True),
                 )
             )
+
+        # Verify counter was incremented correctly
+        from app.models.counter import Counter
+        counter = init_db.query(Counter).filter(Counter.id == "receipt-2026").first()
+        assert counter is not None
+        assert counter.value == 2
+
     finally:
         init_db.close()
         for session in sessions:
             session.close()
+        engine.dispose()
 
     assert len(results) == 2
     assert sorted(result.invoice_number for result in results) == ["R/2026/001", "R/2026/002"]
-
-    # Verify counter was incremented correctly
-    from app.models.counter import Counter
-    counter = init_db.query(Counter).filter(Counter.id == "receipt-2026").first()
-    assert counter is not None
-    assert counter.value == 2
 
 
 def test_concurrent_invoice_creation_many(tmp_path: Path):
@@ -104,17 +106,19 @@ def test_concurrent_invoice_creation_many(tmp_path: Path):
                     zip(sessions, transaction_ids, strict=True),
                 )
             )
+
+        # Verify counter value
+        from app.models.counter import Counter
+        counter = init_db.query(Counter).filter(Counter.id == "receipt-2026").first()
+        assert counter is not None
+        assert counter.value == num_threads
+
     finally:
         init_db.close()
         for session in sessions:
             session.close()
+        engine.dispose()
 
     assert len(results) == num_threads
     invoice_numbers = [r.invoice_number for r in results]
     assert sorted(invoice_numbers) == [f"R/2026/{idx:03d}" for idx in range(1, num_threads + 1)]
-
-    # Verify counter value
-    from app.models.counter import Counter
-    counter = init_db.query(Counter).filter(Counter.id == "receipt-2026").first()
-    assert counter is not None
-    assert counter.value == num_threads

@@ -1,8 +1,9 @@
 from decimal import Decimal
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field
 from datetime import date
 from typing import Optional
+from app.schemas.serializers import DecimalMoneyMixin
 
 
 class TransactionCreate(BaseModel):
@@ -19,8 +20,7 @@ class TransactionUpdate(BaseModel):
     notes: Optional[str] = None
 
 
-class TransactionResponse(BaseModel):
-    model_config = ConfigDict(json_encoders={Decimal: float})
+class TransactionResponse(DecimalMoneyMixin, BaseModel):
 
     id: str
     date: str

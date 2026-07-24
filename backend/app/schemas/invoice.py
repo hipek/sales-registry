@@ -1,7 +1,8 @@
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from typing import List, Optional
+from app.schemas.serializers import DecimalMoneyMixin
 
 
 class SellerInfo(BaseModel):
@@ -10,8 +11,7 @@ class SellerInfo(BaseModel):
     nip: Optional[str] = None
 
 
-class InvoiceItem(BaseModel):
-    model_config = ConfigDict(json_encoders={Decimal: float})
+class InvoiceItem(DecimalMoneyMixin, BaseModel):
 
     description: str
     quantity: int = 1
@@ -20,8 +20,7 @@ class InvoiceItem(BaseModel):
     total: Decimal
 
 
-class InvoiceResponse(BaseModel):
-    model_config = ConfigDict(json_encoders={Decimal: float})
+class InvoiceResponse(DecimalMoneyMixin, BaseModel):
 
     invoice_number: str
     issue_date: str

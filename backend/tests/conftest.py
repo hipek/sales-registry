@@ -9,20 +9,30 @@ from app.database import get_db
 from app.main import app
 
 
+engine = create_engine(
+    "sqlite:///:memory:",
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
+TestingSession = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+
+
 @pytest.fixture
 def db_session():
-    engine = create_engine(
-        "sqlite:///:memory:",
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
-    )
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-    TestingSession = sessionmaker(bind=engine, autocommit=False, autoflush=False)
     session = TestingSession()
     try:
         yield session
     finally:
         session.close()
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _engine_teardown():
+    yield
+    Base.metadata.drop_all(bind=engine)
+    engine.dispose()
 
 
 @pytest.fixture(autouse=True)
