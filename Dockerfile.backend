@@ -8,7 +8,7 @@ RUN uv sync --frozen --no-dev
 
 COPY backend/ .
 # Remove host .venv (macOS symlinks) if copied; re-sync for Linux
-RUN rm -rf .venv && uv sync --frozen --no-dev
+RUN rm -rf .venv-container && UV_PROJECT_ENVIRONMENT=.venv-container uv sync --frozen --no-dev
 
 EXPOSE 8000
 CMD ["uv", "run", "python", "-m", "app"]
