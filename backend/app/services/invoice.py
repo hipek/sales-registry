@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.transaction import Transaction
 from app.models.counter import Counter
+from app.models.counter_lock import CounterLock
 from app.schemas.invoice import InvoiceResponse, SellerInfo, InvoiceItem
 
 
@@ -26,24 +27,34 @@ class InvoiceService:
             year = transaction.date[:4]
             counter_id = f"receipt-{year}"
 
-            # Atomic increment — prevents duplicate invoice numbers under concurrency
-            result = db.execute(
-                update(Counter)
-                .where(Counter.id == counter_id)
-                .values(value=Counter.value + 1)
-            )
-            if result.rowcount == 0:
-                # Counter doesn't exist yet — insert with value 1
-                counter = Counter(id=counter_id, value=1)
-                db.add(counter)
-                db.flush()  # assigns without committing
-                new_value = 1
-            else:
-                new_value = db.query(Counter.value).filter(Counter.id == counter_id).scalar()
+            # Acquire lock for counter
+            lock = CounterLock(id=counter_id)
+            db.add(lock)
+            db.flush()
 
-            invoice_number = f"{settings.receipt_prefix}/{year}/{new_value:03d}"
-            transaction.invoice_number = invoice_number
-            db.commit()
+            try:
+                # Atomic increment — prevents duplicate invoice numbers under concurrency
+                result = db.execute(
+                    update(Counter)
+                    .where(Counter.id == counter_id)
+                    .values(value=Counter.value + 1)
+                )
+                if result.rowcount == 0:
+                    # Counter doesn't exist yet — insert with value 1
+                    counter = Counter(id=counter_id, value=1)
+                    db.add(counter)
+                    db.flush()  # assigns without committing
+                    new_value = 1
+                else:
+                    new_value = db.query(Counter.value).filter(Counter.id == counter_id).scalar()
+
+                invoice_number = f"{settings.receipt_prefix}/{year}/{new_value:03d}"
+                transaction.invoice_number = invoice_number
+                db.commit()
+            finally:
+                # Release lock
+                db.query(CounterLock).filter(CounterLock.id == counter_id).delete()
+                db.commit()
 
         seller = SellerInfo(
             name=settings.seller_name,
