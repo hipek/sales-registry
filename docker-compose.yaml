@@ -32,6 +32,7 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      - NEXT_DEV_ALLOW_ALL_ORIGINS=true
       - NEXT_PUBLIC_API_URL=http://localhost:8000
       - BACKEND_API_URL=http://backend-dev:8000
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
