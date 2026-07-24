@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
-    database_url: str
+    database_url: str = "sqlite:///./data/database.sqlite"
     seller_name: str = "Jan Kowalski"
     seller_address: str = "ul. Testowa 1, 00-001 Warszawa"
     seller_nip: str | None = None
