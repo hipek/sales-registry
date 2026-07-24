@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
+  turbopack: {},
   rewrites: async () => [
     {
       source: "/api/:path*",

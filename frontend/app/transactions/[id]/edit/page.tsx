@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, use } from "react"
 import { api } from "@/lib/api-client"
 import { TransactionForm } from "@/components/transactions/transaction-form"
 
@@ -13,7 +13,7 @@ interface TransactionData {
 }
 
 interface EditPageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default function EditTransactionPage({ params }: EditPageProps) {
@@ -22,17 +22,19 @@ export default function EditTransactionPage({ params }: EditPageProps) {
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
+  const resolvedParams = use(params)
+
   useEffect(() => {
-    api.get<TransactionData>(`/api/transactions/${params.id}`)
+    api.get<TransactionData>(`/api/transactions/${resolvedParams.id}`)
       .then(setTransaction)
       .catch((e) => setFetchError(e instanceof Error ? e.message : "Failed to load transaction"))
       .finally(() => setLoading(false))
-  }, [params.id])
+  }, [resolvedParams.id])
 
   const handleSubmit = async (data: { date: string; description: string; amount: number; notes?: string }) => {
     setSubmitError(null)
     try {
-      await api.put(`/api/transactions/${params.id}`, {
+      await api.put(`/api/transactions/${resolvedParams.id}`, {
         date: data.date,
         description: data.description,
         amount: data.amount,

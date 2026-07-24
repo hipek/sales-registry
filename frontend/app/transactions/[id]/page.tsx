@@ -19,9 +19,10 @@ async function getTransaction(id: string) {
 export default async function TransactionDetailPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const transaction = await getTransaction(params.id)
+  const { id } = await params
+  const transaction = await getTransaction(id)
 
   return <TransactionDetail transaction={transaction} />
 }

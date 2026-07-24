@@ -31,7 +31,7 @@ services:
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://localhost:8000
-      - BACKEND_API_URL=http://host.docker.internal:8000
+      - BACKEND_API_URL=http://backend-dev:8000
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
     depends_on:
       backend-dev:
