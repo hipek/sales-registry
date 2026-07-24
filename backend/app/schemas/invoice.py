@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -12,8 +14,8 @@ class InvoiceItem(BaseModel):
     description: str
     quantity: int = 1
     unit: str = "szt."
-    unit_price: float
-    total: float
+    unit_price: Decimal
+    total: Decimal
 
 
 class InvoiceResponse(BaseModel):
@@ -21,4 +23,4 @@ class InvoiceResponse(BaseModel):
     issue_date: str
     seller: SellerInfo
     items: List[InvoiceItem]
-    total: float
+    total: Decimal

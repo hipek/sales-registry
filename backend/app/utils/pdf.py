@@ -10,6 +10,9 @@ def sanitize_filename(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "_", name)
 
 
+from decimal import Decimal
+
+
 def generate_receipt_pdf(
     invoice_number: str,
     issue_date: str,
@@ -17,7 +20,7 @@ def generate_receipt_pdf(
     seller_address: str,
     seller_nip: str | None,
     description: str,
-    amount: float,
+    amount: Decimal,
 ) -> bytes:
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)

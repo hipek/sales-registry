@@ -1,4 +1,6 @@
-from sqlalchemy import Column, String, Float, DateTime, Text
+from decimal import Decimal
+
+from sqlalchemy import Column, String, Numeric, DateTime, Text
 from sqlalchemy.orm import DeclarativeBase
 import uuid
 from datetime import datetime, UTC
@@ -14,7 +16,7 @@ class Transaction(Base):
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     date = Column(String, nullable=False)  # ISO date "YYYY-MM-DD"
     description = Column(String, nullable=False)
-    amount = Column(Float, nullable=False)  # Gross PLN
+    amount = Column(Numeric(12, 2), nullable=False)  # Gross PLN
     invoice_number = Column(String, nullable=True)
     notes = Column(Text, nullable=True)
     deleted_at = Column(DateTime, nullable=True)  # Soft delete

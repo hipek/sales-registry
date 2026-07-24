@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -8,7 +10,7 @@ from app.utils.date import get_current_quarter, get_quarter_date_range
 
 class LimitService:
     @staticmethod
-    def get_current(db: Session, quarterly_limit: float) -> QuarterlyLimitResponse:
+    def get_current(db: Session, quarterly_limit: Decimal) -> QuarterlyLimitResponse:
         year, quarter = get_current_quarter()
         start_date, end_date = get_quarter_date_range(year, quarter)
 
@@ -21,14 +23,14 @@ class LimitService:
             )
             .scalar()
         )
-        used = float(used) if used else 0.0
-        remaining = max(0, quarterly_limit - used)
+        used = Decimal(str(used)) if used else Decimal("0")
+        remaining = max(Decimal("0"), quarterly_limit - used)
 
         return QuarterlyLimitResponse(
             year=year,
             quarter=quarter,
-            limit=quarterly_limit,
-            used=round(used, 2),
-            remaining=round(remaining, 2),
+            limit=Decimal(str(quarterly_limit)),
+            used=used,
+            remaining=remaining,
             is_exceeded=used > quarterly_limit,
         )
