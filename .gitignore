@@ -13,3 +13,7 @@ backend/.venv-container/
 *.pyc
 .DS_Store
 frontend/tsconfig.tsbuildinfo
+e2e/artifacts/
+e2e/test-results/
+e2e/results/
+e2e/playwright-report/

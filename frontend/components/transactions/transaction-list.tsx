@@ -73,7 +73,7 @@ export function TransactionList({
               <Download className="mr-2 h-4 w-4" /> CSV
             </a>
           </Button>
-          <Button size="sm" asChild>
+          <Button data-testid="add-transaction-button" size="sm" asChild>
             <Link href="/transactions/new">
               <Plus className="mr-2 h-4 w-4" /> Add
             </Link>
@@ -138,7 +138,11 @@ export function TransactionList({
               </TableRow>
             ) : (
               transactions.map((t) => (
-                <TableRow key={t.id} className="group">
+                <TableRow
+                  key={t.id}
+                  data-testid="transaction-row"
+                  className="group"
+                >
                   <TableCell className="tabular-nums text-muted-foreground">
                     {formatDate(t.date)}
                   </TableCell>

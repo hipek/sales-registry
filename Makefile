@@ -1,4 +1,4 @@
-.PHONY: start stop build logs clean dev dev-backend dev-frontend test test-backend frontend-check init backend-check
+.PHONY: start stop build logs clean dev dev-backend dev-frontend test test-backend frontend-check init backend-check e2e e2e-setup e2e-clean
 
 start:
 	docker compose up -d backend-dev frontend-dev
@@ -50,3 +50,16 @@ frontend-check:
 
 backend-check:
 	cd backend && uv sync --frozen && uv run ruff check . && uv run ruff format . --check
+
+e2e:	e2e-clean e2e-setup
+	docker compose run --rm e2e
+	@echo "✅ E2E tests done"
+
+e2e-setup:
+	docker compose up --force-recreate -d --wait backend-e2e frontend-e2e
+	docker compose run --rm backend-e2e sh -c "export UV_PROJECT_ENVIRONMENT=.venv-container && uv run alembic upgrade head"
+	@echo "✅ E2E environment ready"
+
+e2e-clean:
+	rm -f ./data/e2e.sqlite ./data/e2e.sqlite-wal ./data/e2e.sqlite-shm
+	@echo "✅ Old e2e database cleaned"

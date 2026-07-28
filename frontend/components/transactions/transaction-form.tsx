@@ -81,6 +81,7 @@ export function TransactionForm({
       <div>
         <Label htmlFor="date">Date</Label>
         <Input
+          data-testid="date-input"
           id="date"
           type="date"
           {...register("date", { required: "Date is required" })}
@@ -93,6 +94,7 @@ export function TransactionForm({
       <div>
         <Label htmlFor="description">Description</Label>
         <Input
+          data-testid="description-input"
           id="description"
           {...register("description", {
             required: "Description is required",
@@ -112,6 +114,7 @@ export function TransactionForm({
       <div>
         <Label htmlFor="amount">Amount (PLN)</Label>
         <Input
+          data-testid="amount-input"
           id="amount"
           type="number"
           step="0.01"
@@ -128,7 +131,7 @@ export function TransactionForm({
 
       <div>
         <Label htmlFor="notes">Notes (optional)</Label>
-        <Input id="notes" {...register("notes")} />
+        <Input data-testid="notes-input" id="notes" {...register("notes")} />
       </div>
 
       <div className="flex gap-2">
