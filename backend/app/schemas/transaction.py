@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date as date_type
 from decimal import Decimal
 from typing import Optional
 
@@ -8,14 +8,14 @@ from app.schemas.serializers import DecimalMoneyMixin
 
 
 class TransactionCreate(BaseModel):
-    date: date
+    date: date_type
     description: str = Field(min_length=1, max_length=500)
     amount: Decimal = Field(gt=Decimal("0"), le=Decimal("1000000.00"))
     notes: Optional[str] = None
 
 
 class TransactionUpdate(BaseModel):
-    date: Optional[date] = None
+    date: Optional[date_type] = None
     description: Optional[str] = Field(None, min_length=1, max_length=500)
     amount: Optional[Decimal] = Field(None, gt=Decimal("0"), le=Decimal("1000000.00"))
     notes: Optional[str] = None

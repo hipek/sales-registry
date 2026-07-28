@@ -11,13 +11,11 @@ test("adds a new item to the sales list", async ({ page }) => {
   ).toBeVisible();
 
   await page.getByLabel("Date").fill(today);
-  await page.getByLabel("Description").fill("E2E test item");
+  await page.getByLabel("Description").fill("E2E Add Test");
   await page.getByLabel("Amount (PLN)").fill("100.00");
   await page.getByRole("button", { name: "Add" }).click();
 
   await page.waitForURL("**/transactions");
-  await expect(page.getByTestId("transaction-row")).toContainText(
-    "E2E test item",
-  );
-  await expect(page.getByTestId("transaction-row")).toContainText("100.00 PLN");
+  const row = page.getByRole('row', { name: 'E2E Add Test' });
+  await expect(row).toContainText("100.00 PLN");
 });

@@ -174,6 +174,7 @@ export function TransactionList({
                         </Link>
                       </Button>
                       <Button
+                        data-testid="edit-transaction-button"
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
