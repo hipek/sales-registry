@@ -1,4 +1,4 @@
-.PHONY: start stop build logs clean dev dev-backend dev-frontend test test-backend test-frontend init frontend-check backend-check
+.PHONY: start stop build logs clean dev dev-backend dev-frontend test test-backend frontend-check init backend-check
 
 start:
 	docker compose up -d backend-dev frontend-dev
@@ -36,13 +36,16 @@ dev-frontend:
 dev:
 	@echo "Use 'make start' to run both backend + frontend in dev mode"
 
-test: test-backend test-frontend
+test: test-backend
 	@echo "✅ All tests passed"
 
 test-backend:
 	docker compose run --rm -v ./backend/tests:/app/tests backend-dev sh -c "export UV_PROJECT_ENVIRONMENT=.venv-container && uv sync --frozen && uv run pytest -q"
 
-test-frontend:
+ci: test backend-check frontend-check
+	@echo "✅ CI checks passed"
+
+frontend-check:
 	cd frontend && pnpm run lint && ./node_modules/.bin/tsc --noEmit && pnpm run format
 
 backend-check:
