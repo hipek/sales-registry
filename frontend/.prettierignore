@@ -4,3 +4,4 @@ dist
 .output
 standalone
 .pnpm-store
+next-env.d.ts
