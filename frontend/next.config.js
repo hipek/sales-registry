@@ -10,6 +10,9 @@ const wildcardOrigins = ["*.*.*.*", "*.*.*", "*.*"];
 
 const nextConfig = {
   output: "standalone",
+  experimental: {
+    useTypeScriptCli: true,
+  },
   turbopack: {},
   // Next allowedDevOrigins accepts hostnames, not CIDR. These patterns allow any IPv4/LAN origin in dev.
   allowedDevOrigins: [
