@@ -3,6 +3,7 @@ const nextJs = require("@next/eslint-plugin-next")
 module.exports = [
   {
     files: ["**/*.ts", "**/*.tsx"],
+    ignores: [".next/**", "node_modules/**", "dist/**", ".output/**"],
     plugins: {
       "@next/next": nextJs,
     },

@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { formatPLN } from "@/lib/format"
 import { formatDate } from "@/lib/date"
+import { transactionCsvUrl } from "@/lib/api-links"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -60,7 +61,7 @@ export function TransactionList({
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
-            <a href="/api/transactions/export">
+            <a href={transactionCsvUrl()}>
               <Download className="mr-2 h-4 w-4" /> CSV
             </a>
           </Button>

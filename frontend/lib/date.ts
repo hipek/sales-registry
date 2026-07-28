@@ -6,11 +6,6 @@ export function formatDate(dateStr: string): string {
   return format(date, "d MMMM yyyy", { locale: pl })
 }
 
-export function formatDateShort(dateStr: string): string {
-  const date = parse(dateStr, "yyyy-MM-dd", new Date())
-  return format(date, "dd.MM.yyyy")
-}
-
 export function getToday(): string {
   return format(new Date(), "yyyy-MM-dd")
 }

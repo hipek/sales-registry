@@ -2,6 +2,7 @@ import Link from "next/link"
 import { formatPLN } from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { invoicePdfUrl } from "@/lib/api-links"
 import { ArrowLeft, Download, Building2, FileText } from "lucide-react"
 
 interface InvoiceItem {
@@ -45,7 +46,7 @@ export function InvoicePreview({ invoice, transactionId }: InvoicePreviewProps) 
           </div>
         </div>
         <Button size="sm" asChild>
-          <a href={`/api/invoices/${transactionId}/download`}>
+          <a href={invoicePdfUrl(transactionId)}>
             <Download className="mr-2 h-4 w-4" /> Download PDF
           </a>
         </Button>
