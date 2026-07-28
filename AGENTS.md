@@ -6,20 +6,15 @@ Web app for 3D printing sales records. Polish tax-free quarterly limit: 10,813.5
 
 ## Stack
 
-| Layer | Tech |
-|-------|------|
-| Frontend | Next.js 14 App Router, Tailwind v3, shadcn/ui, TypeScript |
-| Backend | Python 3.12+, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2 |
-| DB | SQLite (dev), PostgreSQL (prod) |
-| Package | uv (Python), pnpm (Node) |
+See [README.md](README.md) for full stack details.
 
 ## Layout
 
 ```
 backend/    # FastAPI app, alembic, tests
+e2e/        # Playwright e2e tests
 frontend/   # Next.js app, components, lib, tests
 data/       # Local data files
-docs/       # Documentation
 ```
 
 ## Key Paths
@@ -41,6 +36,13 @@ make frontend     # Start frontend only
 # Build (Docker)
 make build        # Build Docker images
 make deploy       # Deploy with docker-compose
+
+# E2E
+make e2e          # Run Playwright e2e tests
+make e2e-clean    # Clean e2e database
+
+# Checks
+make ci           # Run lint, typecheck, format checks
 
 # Python
 uv sync           # Install deps

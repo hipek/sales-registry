@@ -15,7 +15,7 @@ Web app for simplified sales records for unregistered business activity (*dział
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 14 (App Router), Tailwind CSS v3, shadcn/ui, TypeScript |
+| Frontend | Next.js 16 (App Router), Tailwind CSS v4, shadcn/ui, TypeScript |
 | Backend | Python 3.12+, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2 |
 | PDF | ReportLab |
 | Database | SQLite (dev), PostgreSQL-ready (SQLAlchemy) |
@@ -56,6 +56,9 @@ make dev          # local dev (run in 2 terminals)
 | `make dev` | Show instructions for local dev (2 terminals) |
 | `make dev-backend` | Start FastAPI dev server with hot reload on `:8000` |
 | `make dev-frontend` | Start Next.js dev server on `:3000` |
+| `make init` | Run DB migrations on startup |
+| `make ci` | Run lint, typecheck, format checks |
+| `make e2e` | Run Playwright e2e tests |
 
 ### Typical dev workflow
 
@@ -89,6 +92,8 @@ Optional:
 | `RECEIPT_UNIT` | `szt.` | Receipt unit (Polish for "pieces") |
 | `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | Public app URL |
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Backend API URL (frontend) |
+| `BACKEND_API_URL` | `http://localhost:8000` | Backend API URL (frontend, internal) |
+| `NEXT_DEV_ALLOW_ALL_ORIGINS` | `true` | Allow all origins in dev |
 | `CORS_ORIGINS` | `http://localhost:3000,http://host.docker.internal:8000` | Allowed CORS origins |
 | `BACKEND_HOST` | `0.0.0.0` | Uvicorn bind address |
 | `BACKEND_PORT` | `8000` | Uvicorn port |
@@ -113,8 +118,8 @@ Optional:
 │   │   └── utils/     # PDF, date helpers
 │   ├── alembic/       # DB migrations
 │   └── tests/         # pytest tests
-├── docs/plan.md       # Full application plan
-├── docker-compose.yml
+├── e2e/               # Playwright e2e tests
+├── docker-compose.yaml
 ├── Dockerfile.backend
 ├── Dockerfile.frontend
 └── Makefile
