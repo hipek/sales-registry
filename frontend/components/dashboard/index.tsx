@@ -40,7 +40,8 @@ export function Dashboard({ limit, transactions }: DashboardProps) {
 
       {limit.is_exceeded && (
         <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200">
-          <span className="font-semibold">⚠️ Quarterly limit exceeded!</span> Reached {limit.used.toFixed(2)} PLN of {limit.limit.toFixed(2)} PLN.
+          <span className="font-semibold">⚠️ Quarterly limit exceeded!</span>{" "}
+          Reached {limit.used.toFixed(2)} PLN of {limit.limit.toFixed(2)} PLN.
         </div>
       )}
 

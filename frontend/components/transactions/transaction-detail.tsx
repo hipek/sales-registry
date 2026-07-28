@@ -3,7 +3,15 @@ import { formatPLN } from "@/lib/format"
 import { formatDate } from "@/lib/date"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, FileText, Edit, Calendar, Tag, FileDigit, StickyNote } from "lucide-react"
+import {
+  ArrowLeft,
+  FileText,
+  Edit,
+  Calendar,
+  Tag,
+  FileDigit,
+  StickyNote,
+} from "lucide-react"
 
 interface TransactionDetailProps {
   transaction: {
@@ -19,8 +27,17 @@ interface TransactionDetailProps {
 export function TransactionDetail({ transaction }: TransactionDetailProps) {
   const details = [
     { icon: Calendar, label: "Date", value: formatDate(transaction.date) },
-    { icon: Tag, label: "Amount", value: formatPLN(transaction.amount), highlight: true },
-    { icon: FileDigit, label: "Receipt no.", value: transaction.invoice_number || "—" },
+    {
+      icon: Tag,
+      label: "Amount",
+      value: formatPLN(transaction.amount),
+      highlight: true,
+    },
+    {
+      icon: FileDigit,
+      label: "Receipt no.",
+      value: transaction.invoice_number || "—",
+    },
     { icon: StickyNote, label: "Notes", value: transaction.notes || "—" },
   ]
 
@@ -32,7 +49,9 @@ export function TransactionDetail({ transaction }: TransactionDetailProps) {
             <ArrowLeft className="mr-1 h-4 w-4" /> Back
           </Link>
         </Button>
-        <h1 className="text-2xl font-bold tracking-tight">Transaction details</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Transaction details
+        </h1>
       </div>
 
       <Card>
@@ -44,7 +63,13 @@ export function TransactionDetail({ transaction }: TransactionDetailProps) {
             <div key={label} className="flex items-center gap-3 px-6 py-3.5">
               <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
               <dt className="w-28 text-sm text-muted-foreground">{label}</dt>
-              <dd className={highlight ? "text-lg font-bold tabular-nums text-primary" : "text-sm font-medium"}>
+              <dd
+                className={
+                  highlight
+                    ? "text-lg font-bold tabular-nums text-primary"
+                    : "text-sm font-medium"
+                }
+              >
                 {value}
               </dd>
             </div>

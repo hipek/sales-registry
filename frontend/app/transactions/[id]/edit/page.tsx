@@ -25,13 +25,23 @@ export default function EditTransactionPage({ params }: EditPageProps) {
   const resolvedParams = use(params)
 
   useEffect(() => {
-    api.get<TransactionData>(`/api/transactions/${resolvedParams.id}`)
+    api
+      .get<TransactionData>(`/api/transactions/${resolvedParams.id}`)
       .then(setTransaction)
-      .catch((e) => setFetchError(e instanceof Error ? e.message : "Failed to load transaction"))
+      .catch((e) =>
+        setFetchError(
+          e instanceof Error ? e.message : "Failed to load transaction",
+        ),
+      )
       .finally(() => setLoading(false))
   }, [resolvedParams.id])
 
-  const handleSubmit = async (data: { date: string; description: string; amount: number; notes?: string }) => {
+  const handleSubmit = async (data: {
+    date: string
+    description: string
+    amount: number
+    notes?: string
+  }) => {
     setSubmitError(null)
     try {
       await api.put(`/api/transactions/${resolvedParams.id}`, {

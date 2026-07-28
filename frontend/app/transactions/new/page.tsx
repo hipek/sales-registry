@@ -7,7 +7,12 @@ import { TransactionForm } from "@/components/transactions/transaction-form"
 export default function NewTransactionPage() {
   const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = async (data: { date: string; description: string; amount: number; notes?: string }) => {
+  const handleSubmit = async (data: {
+    date: string
+    description: string
+    amount: number
+    notes?: string
+  }) => {
     setError(null)
     try {
       await api.post("/api/transactions", {

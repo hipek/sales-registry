@@ -12,7 +12,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Plus, Download, Trash2, Eye, Pencil, Search, Calendar } from "lucide-react"
+import {
+  Plus,
+  Download,
+  Trash2,
+  Eye,
+  Pencil,
+  Search,
+  Calendar,
+} from "lucide-react"
 
 interface Transaction {
   id: string
@@ -118,9 +126,13 @@ export function TransactionList({
             {transactions.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="h-32 text-center">
-                  <p className="text-sm text-muted-foreground">No transactions</p>
+                  <p className="text-sm text-muted-foreground">
+                    No transactions
+                  </p>
                   <Button variant="link" size="sm" asChild>
-                    <Link href="/transactions/new">Add your first transaction</Link>
+                    <Link href="/transactions/new">
+                      Add your first transaction
+                    </Link>
                   </Button>
                 </TableCell>
               </TableRow>
@@ -131,7 +143,10 @@ export function TransactionList({
                     {formatDate(t.date)}
                   </TableCell>
                   <TableCell>
-                    <Link href={`/transactions/${t.id}`} className="font-medium hover:text-primary hover:underline">
+                    <Link
+                      href={`/transactions/${t.id}`}
+                      className="font-medium hover:text-primary hover:underline"
+                    >
                       {t.description}
                     </Link>
                   </TableCell>
@@ -143,19 +158,34 @@ export function TransactionList({
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-0.5 opacity-60 transition-opacity group-hover:opacity-100">
-                      <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        asChild
+                      >
                         <Link href={`/transactions/${t.id}`}>
                           <Eye className="h-3.5 w-3.5" />
                           <span className="sr-only">Details</span>
                         </Link>
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        asChild
+                      >
                         <Link href={`/transactions/${t.id}/edit`}>
                           <Pencil className="h-3.5 w-3.5" />
                           <span className="sr-only">Edit</span>
                         </Link>
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10" onClick={() => onDelete(t.id)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 hover:bg-destructive/10"
+                        onClick={() => onDelete(t.id)}
+                      >
                         <Trash2 className="h-3.5 w-3.5 text-destructive" />
                         <span className="sr-only">Delete</span>
                       </Button>

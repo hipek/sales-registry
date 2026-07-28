@@ -12,28 +12,47 @@ interface LimitGaugeProps {
   isExceeded: boolean
 }
 
-export function LimitGauge({ year, quarter, limit, used, remaining, isExceeded }: LimitGaugeProps) {
+export function LimitGauge({
+  year,
+  quarter,
+  limit,
+  used,
+  remaining,
+  isExceeded,
+}: LimitGaugeProps) {
   const percentage = limit > 0 ? Math.min((used / limit) * 100, 100) : 0
 
   const barColor = isExceeded
     ? "from-red-500 to-red-400"
     : percentage > 80
-    ? "from-amber-500 to-yellow-400"
-    : "from-emerald-500 to-green-400"
+      ? "from-amber-500 to-yellow-400"
+      : "from-emerald-500 to-green-400"
 
-  const statusIcon = isExceeded
-    ? <AlertTriangle className="h-4 w-4" />
-    : <CheckCircle2 className="h-4 w-4" />
+  const statusIcon = isExceeded ? (
+    <AlertTriangle className="h-4 w-4" />
+  ) : (
+    <CheckCircle2 className="h-4 w-4" />
+  )
 
-  const statusLabel = isExceeded ? "Exceeded" : percentage > 80 ? "Near limit" : "Normal"
-  const statusVariant = isExceeded ? "destructive" : percentage > 80 ? "secondary" : "default"
+  const statusLabel = isExceeded
+    ? "Exceeded"
+    : percentage > 80
+      ? "Near limit"
+      : "Normal"
+  const statusVariant = isExceeded
+    ? "destructive"
+    : percentage > 80
+      ? "secondary"
+      : "default"
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
         <div>
           <CardTitle className="text-base">Quarterly limit</CardTitle>
-          <p className="text-xs text-muted-foreground mt-0.5">Q{quarter} {year}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Q{quarter} {year}
+          </p>
         </div>
         <Badge variant={statusVariant} className="gap-1 font-normal">
           {statusIcon}
@@ -44,11 +63,16 @@ export function LimitGauge({ year, quarter, limit, used, remaining, isExceeded }
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Usage</span>
-            <span className="font-semibold tabular-nums">{percentage.toFixed(1)}%</span>
+            <span className="font-semibold tabular-nums">
+              {percentage.toFixed(1)}%
+            </span>
           </div>
           <div className="relative h-3 w-full overflow-hidden rounded-full bg-muted">
             <div
-              className={cn("h-full w-full rounded-full bg-gradient-to-r transition-all duration-500", barColor)}
+              className={cn(
+                "h-full w-full rounded-full bg-gradient-to-r transition-all duration-500",
+                barColor,
+              )}
               style={{ width: `${percentage}%` }}
             />
           </div>
@@ -57,10 +81,12 @@ export function LimitGauge({ year, quarter, limit, used, remaining, isExceeded }
         <div className="grid grid-cols-3 gap-4 rounded-lg bg-muted/50 p-3">
           <div>
             <dt className="text-xs text-muted-foreground">Used</dt>
-            <dd className={cn(
-              "mt-0.5 text-sm font-semibold tabular-nums",
-              isExceeded && "text-destructive"
-            )}>
+            <dd
+              className={cn(
+                "mt-0.5 text-sm font-semibold tabular-nums",
+                isExceeded && "text-destructive",
+              )}
+            >
               {used.toFixed(2)} PLN
             </dd>
           </div>
@@ -82,7 +108,8 @@ export function LimitGauge({ year, quarter, limit, used, remaining, isExceeded }
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <TrendingUp className="h-3.5 w-3.5 text-primary" />
             <span>
-              Used {used.toFixed(2)} PLN of {limit.toFixed(2)} PLN quarterly limit
+              Used {used.toFixed(2)} PLN of {limit.toFixed(2)} PLN quarterly
+              limit
             </span>
           </div>
         )}

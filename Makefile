@@ -1,4 +1,4 @@
-.PHONY: start stop build logs clean dev dev-backend dev-frontend test test-backend test-frontend init
+.PHONY: start stop build logs clean dev dev-backend dev-frontend test test-backend test-frontend init frontend-check
 
 start:
 	docker compose up -d backend-dev frontend-dev
@@ -44,3 +44,6 @@ test-backend:
 
 test-frontend:
 	docker compose run --rm --no-deps -v ./frontend:/app -w /app -e CI=true -e NODE_ENV=development frontend-dev sh -c "corepack enable && corepack prepare pnpm@9 --activate && pnpm install --frozen-lockfile && pnpm vitest run --passWithNoTests"
+
+frontend-check:
+	cd frontend && pnpm run lint && ./node_modules/.bin/tsc --noEmit && pnpm run format

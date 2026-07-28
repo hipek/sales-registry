@@ -4,9 +4,9 @@ const originHosts = (value) =>
     .map((v) => v.trim())
     .map((v) => v.replace(/^https?:\/\//, ""))
     .map((v) => v.replace(/:\d+$/, ""))
-    .filter(Boolean);
+    .filter(Boolean)
 
-const wildcardOrigins = ["*.*.*.*", "*.*.*", "*.*"];
+const wildcardOrigins = ["*.*.*.*", "*.*.*", "*.*"]
 
 const nextConfig = {
   output: "standalone",
@@ -32,6 +32,6 @@ const nextConfig = {
       destination: `${process.env.BACKEND_API_URL || "http://localhost:8000"}/api/:path*`,
     },
   ],
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

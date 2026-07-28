@@ -23,17 +23,27 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={cn(inter.className, "min-h-screen bg-background antialiased")}>
+      <body
+        className={cn(
+          inter.className,
+          "min-h-screen bg-background antialiased",
+        )}
+      >
         <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
           <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold text-foreground">
+            <Link
+              href="/"
+              className="flex items-center gap-2 font-semibold text-foreground"
+            >
               <Receipt className="h-5 w-5 text-primary" />
               <span>3D Receipt Register</span>
             </Link>
             <nav className="flex items-center gap-1">
               {navLinks.map((link) => {
                 const isActive =
-                  link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)
+                  link.href === "/"
+                    ? pathname === "/"
+                    : pathname.startsWith(link.href)
                 return (
                   <Link
                     key={link.href}
@@ -42,7 +52,7 @@ export default function RootLayout({
                       "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                       isActive
                         ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-accent/10 hover:text-accent"
+                        : "text-muted-foreground hover:bg-accent/10 hover:text-accent",
                     )}
                   >
                     <link.icon className="h-4 w-4" />

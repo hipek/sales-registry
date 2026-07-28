@@ -28,7 +28,10 @@ interface InvoicePreviewProps {
   transactionId: string
 }
 
-export function InvoicePreview({ invoice, transactionId }: InvoicePreviewProps) {
+export function InvoicePreview({
+  invoice,
+  transactionId,
+}: InvoicePreviewProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -39,7 +42,9 @@ export function InvoicePreview({ invoice, transactionId }: InvoicePreviewProps) 
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Receipt {invoice.invoice_number}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+              Receipt {invoice.invoice_number}
+            </h1>
             <p className="text-sm text-muted-foreground mt-0.5">
               Non-registered sales
             </p>
@@ -58,9 +63,13 @@ export function InvoicePreview({ invoice, transactionId }: InvoicePreviewProps) 
             <Building2 className="h-5 w-5 text-primary" />
             <div>
               <CardTitle className="text-base">{invoice.seller.name}</CardTitle>
-              <p className="text-xs text-muted-foreground">{invoice.seller.address}</p>
+              <p className="text-xs text-muted-foreground">
+                {invoice.seller.address}
+              </p>
               {invoice.seller.nip && (
-                <p className="text-xs text-muted-foreground">NIP: {invoice.seller.nip}</p>
+                <p className="text-xs text-muted-foreground">
+                  NIP: {invoice.seller.nip}
+                </p>
               )}
             </div>
           </div>
@@ -81,25 +90,44 @@ export function InvoicePreview({ invoice, transactionId }: InvoicePreviewProps) 
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/30">
-                  <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Service</th>
-                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Qty</th>
-                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Unit price</th>
-                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Total</th>
+                  <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">
+                    Service
+                  </th>
+                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">
+                    Qty
+                  </th>
+                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">
+                    Unit price
+                  </th>
+                  <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">
+                    Total
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {invoice.items.map((item, i) => (
                   <tr key={i} className="border-b last:border-0">
                     <td className="px-4 py-2.5">{item.description}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums">{item.quantity} {item.unit}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums">{formatPLN(item.unit_price)}</td>
-                    <td className="px-4 py-2.5 text-right font-semibold tabular-nums">{formatPLN(item.total)}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">
+                      {item.quantity} {item.unit}
+                    </td>
+                    <td className="px-4 py-2.5 text-right tabular-nums">
+                      {formatPLN(item.unit_price)}
+                    </td>
+                    <td className="px-4 py-2.5 text-right font-semibold tabular-nums">
+                      {formatPLN(item.total)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr className="border-t bg-muted/20">
-                  <td colSpan={3} className="px-4 py-3 text-right text-sm font-semibold">TOTAL:</td>
+                  <td
+                    colSpan={3}
+                    className="px-4 py-3 text-right text-sm font-semibold"
+                  >
+                    TOTAL:
+                  </td>
                   <td className="px-4 py-3 text-right text-base font-bold tabular-nums text-primary">
                     {formatPLN(invoice.total)}
                   </td>

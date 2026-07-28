@@ -21,24 +21,40 @@ interface TransactionFormProps {
     amount: number
     notes?: string
   }
-  onSubmit: (data: { date: string; description: string; amount: number; notes?: string }) => Promise<void>
+  onSubmit: (data: {
+    date: string
+    description: string
+    amount: number
+    notes?: string
+  }) => Promise<void>
   submitLabel: string
 }
 
-export function TransactionForm({ initialData, onSubmit, submitLabel }: TransactionFormProps) {
+export function TransactionForm({
+  initialData,
+  onSubmit,
+  submitLabel,
+}: TransactionFormProps) {
   const router = useRouter()
-  const { register, handleSubmit, setError, formState: { errors } } = useForm<FormData>({
-    defaultValues: initialData ? {
-      date: initialData.date,
-      description: initialData.description,
-      amount: String(initialData.amount),
-      notes: initialData.notes || "",
-    } : {
-      date: getToday(),
-      description: "",
-      amount: "",
-      notes: "",
-    },
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: initialData
+      ? {
+          date: initialData.date,
+          description: initialData.description,
+          amount: String(initialData.amount),
+          notes: initialData.notes || "",
+        }
+      : {
+          date: getToday(),
+          description: "",
+          amount: "",
+          notes: "",
+        },
   })
 
   const onFormSubmit = async (data: FormData) => {
@@ -64,26 +80,50 @@ export function TransactionForm({ initialData, onSubmit, submitLabel }: Transact
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       <div>
         <Label htmlFor="date">Date</Label>
-        <Input id="date" type="date" {...register("date", { required: "Date is required" })} />
-        {errors.date && <p className="text-sm text-destructive">{errors.date.message}</p>}
+        <Input
+          id="date"
+          type="date"
+          {...register("date", { required: "Date is required" })}
+        />
+        {errors.date && (
+          <p className="text-sm text-destructive">{errors.date.message}</p>
+        )}
       </div>
 
       <div>
         <Label htmlFor="description">Description</Label>
-        <Input id="description" {...register("description", {
-          required: "Description is required",
-          maxLength: { value: 500, message: "Description cannot exceed 500 characters" },
-        })} />
-        {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
+        <Input
+          id="description"
+          {...register("description", {
+            required: "Description is required",
+            maxLength: {
+              value: 500,
+              message: "Description cannot exceed 500 characters",
+            },
+          })}
+        />
+        {errors.description && (
+          <p className="text-sm text-destructive">
+            {errors.description.message}
+          </p>
+        )}
       </div>
 
       <div>
         <Label htmlFor="amount">Amount (PLN)</Label>
-        <Input id="amount" type="number" step="0.01" {...register("amount", {
-          required: "Amount is required",
-          validate: (value) => parseFloat(value) > 0 || "Amount must be greater than 0",
-        })} />
-        {errors.amount && <p className="text-sm text-destructive">{errors.amount.message}</p>}
+        <Input
+          id="amount"
+          type="number"
+          step="0.01"
+          {...register("amount", {
+            required: "Amount is required",
+            validate: (value) =>
+              parseFloat(value) > 0 || "Amount must be greater than 0",
+          })}
+        />
+        {errors.amount && (
+          <p className="text-sm text-destructive">{errors.amount.message}</p>
+        )}
       </div>
 
       <div>

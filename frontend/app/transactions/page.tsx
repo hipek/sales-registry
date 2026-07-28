@@ -17,7 +17,9 @@ export default function TransactionsPage() {
     if (search) params.set("search", search)
     if (fromDate) params.set("from_date", fromDate)
     if (toDate) params.set("to_date", toDate)
-    const result = await api.get<{ data: any[]; meta: any }>(`/api/transactions?${params.toString()}`)
+    const result = await api.get<{ data: any[]; meta: any }>(
+      `/api/transactions?${params.toString()}`,
+    )
     setData(result)
     setLoading(false)
   }, [search, fromDate, toDate])
@@ -42,7 +44,10 @@ export default function TransactionsPage() {
       fromDate={fromDate}
       toDate={toDate}
       onSearch={(val) => setSearch(val)}
-      onDateFilter={(from, to) => { setFromDate(from); setToDate(to) }}
+      onDateFilter={(from, to) => {
+        setFromDate(from)
+        setToDate(to)
+      }}
       onDelete={handleDelete}
     />
   )
