@@ -2,18 +2,18 @@ import threading
 from typing import Optional, Protocol
 
 from fastapi import HTTPException
-
 from sqlalchemy import delete, insert, text, update
 from sqlalchemy.orm import Session
 
 from app.models.counter import Counter
 from app.models.counter_lock import CounterLock
 from app.models.transaction import Transaction
-from app.schemas.invoice import InvoiceResponse, SellerInfo, InvoiceItem
+from app.schemas.invoice import InvoiceItem, InvoiceResponse, SellerInfo
 
 
 class ReceiptSettings(Protocol):
     """Minimal contract for settings used in receipt generation."""
+
     receipt_prefix: str
     seller_name: str
     seller_address: str
@@ -37,10 +37,14 @@ def _get_counter_lock(counter_id: str) -> threading.Lock:
 class InvoiceService:
     @staticmethod
     def get_or_create_invoice(db: Session, transaction_id: str, settings: ReceiptSettings) -> InvoiceResponse:
-        row = db.execute(
-            text("SELECT id, date, description, amount, invoice_number FROM transactions WHERE id = :id"),
-            {"id": transaction_id},
-        ).mappings().first()
+        row = (
+            db.execute(
+                text("SELECT id, date, description, amount, invoice_number FROM transactions WHERE id = :id"),
+                {"id": transaction_id},
+            )
+            .mappings()
+            .first()
+        )
 
         if row is None:
             raise HTTPException(status_code=404, detail={"code": "NOT_FOUND", "message": "Transaction not found"})

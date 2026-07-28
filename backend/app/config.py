@@ -1,7 +1,8 @@
-import os
 from decimal import Decimal
+import os
 from pathlib import Path
-from pydantic import Field, model_validator
+
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -1,9 +1,9 @@
+from io import BytesIO
 import re
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
-from io import BytesIO
 
 
 def sanitize_filename(name: str) -> str:

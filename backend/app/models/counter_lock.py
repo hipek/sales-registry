@@ -1,6 +1,7 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, DateTime, String
+
 from app.models.transaction import Base
 
 

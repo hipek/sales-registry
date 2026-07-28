@@ -1,10 +1,8 @@
-from datetime import date, datetime, UTC
+from datetime import date
 from decimal import Decimal
 
-import pytest
 from sqlalchemy.orm import Session
 
-from app.models.transaction import Transaction
 from app.schemas.transaction import TransactionCreate, TransactionUpdate
 from app.services.transaction import TransactionService
 
@@ -73,11 +71,14 @@ def test_list_empty(db_session: Session):
 def test_list_pagination(db_session: Session):
     svc = TransactionService()
     for i in range(5):
-        svc.create(db_session, TransactionCreate(
-            date=date(2026, 6, 1),
-            description=f"Item {i}",
-            amount=float(i + 1),
-        ))
+        svc.create(
+            db_session,
+            TransactionCreate(
+                date=date(2026, 6, 1),
+                description=f"Item {i}",
+                amount=float(i + 1),
+            ),
+        )
 
     transactions, total = svc.list(db_session, page=1, limit=2)
     assert len(transactions) == 2

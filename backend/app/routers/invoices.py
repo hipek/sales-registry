@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.database import get_db
 from app.schemas.invoice import InvoiceResponse
 from app.services.invoice import InvoiceService
 from app.utils.pdf import generate_receipt_pdf, sanitize_filename
-from app.config import settings
 
 router = APIRouter()
 

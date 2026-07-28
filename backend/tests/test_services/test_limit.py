@@ -2,19 +2,21 @@ from datetime import date
 
 from sqlalchemy.orm import Session
 
-from app.models.transaction import Transaction
+from app.schemas.transaction import TransactionCreate
 from app.services.limit import LimitService
 from app.services.transaction import TransactionService
-from app.schemas.transaction import TransactionCreate
 
 
 def _create_txn(db: Session, day: int, amount: float, month: int = 7):
     svc = TransactionService()
-    svc.create(db, TransactionCreate(
-        date=date(2026, month, day),
-        description=f"Sale {amount}",
-        amount=amount,
-    ))
+    svc.create(
+        db,
+        TransactionCreate(
+            date=date(2026, month, day),
+            description=f"Sale {amount}",
+            amount=amount,
+        ),
+    )
 
 
 def test_get_current_no_transactions(db_session: Session):
@@ -58,11 +60,14 @@ def test_get_current_excludes_soft_deleted(db_session: Session):
     _create_txn(db_session, 1, 1000.0)
 
     txn_svc = TransactionService()
-    txn = txn_svc.create(db_session, TransactionCreate(
-        date=date(2026, 7, 2),
-        description="To delete",
-        amount=5000.0,
-    ))
+    txn = txn_svc.create(
+        db_session,
+        TransactionCreate(
+            date=date(2026, 7, 2),
+            description="To delete",
+            amount=5000.0,
+        ),
+    )
     txn_svc.delete(db_session, txn.id)
 
     svc = LimitService()

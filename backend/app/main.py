@@ -1,17 +1,17 @@
-import logging
 from decimal import Decimal
+import logging
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
-from app.routers import transactions_router, limits_router, invoices_router
+from app.routers import invoices_router, limits_router, transactions_router
 
 app = FastAPI(title="Ewidencja3D")
 
@@ -31,7 +31,9 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         content={
             "error": {
                 "code": exc.detail.get("code", "ERROR") if isinstance(exc.detail, dict) else "ERROR",
-                "message": exc.detail.get("message", str(exc.detail)) if isinstance(exc.detail, dict) else str(exc.detail),
+                "message": exc.detail.get("message", str(exc.detail))
+                if isinstance(exc.detail, dict)
+                else str(exc.detail),
             }
         },
     )

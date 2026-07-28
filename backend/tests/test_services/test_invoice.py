@@ -1,13 +1,11 @@
 from datetime import date
-from unittest.mock import MagicMock
 
 from sqlalchemy.orm import Session
 
-from app.models.transaction import Transaction
 from app.models.counter import Counter
+from app.schemas.transaction import TransactionCreate
 from app.services.invoice import InvoiceService
 from app.services.transaction import TransactionService
-from app.schemas.transaction import TransactionCreate
 
 
 class FakeSettings:
@@ -20,11 +18,14 @@ class FakeSettings:
 
 def test_get_invoice_new(db_session: Session):
     svc = TransactionService()
-    txn = svc.create(db_session, TransactionCreate(
-        date=date(2026, 6, 15),
-        description="Filament PLA",
-        amount=89.99,
-    ))
+    txn = svc.create(
+        db_session,
+        TransactionCreate(
+            date=date(2026, 6, 15),
+            description="Filament PLA",
+            amount=89.99,
+        ),
+    )
 
     inv_svc = InvoiceService()
     invoice = inv_svc.get_or_create_invoice(db_session, txn.id, FakeSettings())

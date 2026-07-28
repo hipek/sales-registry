@@ -24,30 +24,34 @@ def _create_invoice(db: Session, transaction_id: str, inv_svc: InvoiceService):
     return inv_svc.get_or_create_invoice(
         db,
         transaction_id,
-        type('Settings', (), {
-            'receipt_prefix': 'R',
-            'seller_name': 'Test',
-            'seller_address': 'Test St',
-            'seller_nip': '1234567890',
-            'receipt_unit': 'szt.',
-        })()
+        type(
+            "Settings",
+            (),
+            {
+                "receipt_prefix": "R",
+                "seller_name": "Test",
+                "seller_address": "Test St",
+                "seller_nip": "1234567890",
+                "receipt_unit": "szt.",
+            },
+        )(),
     )
 
 
 def _create_txn(db: Session, description: str):
     svc = TransactionService()
-    return svc.create(db, TransactionCreate(
-        date=date(2026, 6, 15),
-        description=description,
-        amount=100.0,
-    ))
+    return svc.create(
+        db,
+        TransactionCreate(
+            date=date(2026, 6, 15),
+            description=description,
+            amount=100.0,
+        ),
+    )
 
 
 def _create_txns(db: Session, count: int):
-    return [
-        _create_txn(db, f"Concurrent txn {idx}")
-        for idx in range(count)
-    ]
+    return [_create_txn(db, f"Concurrent txn {idx}") for idx in range(count)]
 
 
 def test_concurrent_invoice_creation(tmp_path: Path):
@@ -72,6 +76,7 @@ def test_concurrent_invoice_creation(tmp_path: Path):
 
         # Verify counter was incremented correctly
         from app.models.counter import Counter
+
         counter = init_db.query(Counter).filter(Counter.id == "receipt-2026").first()
         assert counter is not None
         assert counter.value == 2
@@ -109,6 +114,7 @@ def test_concurrent_invoice_creation_many(tmp_path: Path):
 
         # Verify counter value
         from app.models.counter import Counter
+
         counter = init_db.query(Counter).filter(Counter.id == "receipt-2026").first()
         assert counter is not None
         assert counter.value == num_threads

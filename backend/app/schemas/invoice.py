@@ -1,7 +1,8 @@
 from decimal import Decimal
+from typing import List, Optional
 
 from pydantic import BaseModel
-from typing import List, Optional
+
 from app.schemas.serializers import DecimalMoneyMixin
 
 
@@ -12,7 +13,6 @@ class SellerInfo(BaseModel):
 
 
 class InvoiceItem(DecimalMoneyMixin, BaseModel):
-
     description: str
     quantity: int = 1
     unit: str = "szt."
@@ -21,7 +21,6 @@ class InvoiceItem(DecimalMoneyMixin, BaseModel):
 
 
 class InvoiceResponse(DecimalMoneyMixin, BaseModel):
-
     invoice_number: str
     issue_date: str
     seller: SellerInfo

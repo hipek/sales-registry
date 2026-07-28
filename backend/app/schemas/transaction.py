@@ -1,8 +1,9 @@
+from datetime import date
 from decimal import Decimal
+from typing import Optional
 
 from pydantic import BaseModel, Field
-from datetime import date
-from typing import Optional
+
 from app.schemas.serializers import DecimalMoneyMixin
 
 
@@ -21,7 +22,6 @@ class TransactionUpdate(BaseModel):
 
 
 class TransactionResponse(DecimalMoneyMixin, BaseModel):
-
     id: str
     date: str
     description: str

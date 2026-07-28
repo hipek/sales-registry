@@ -1,9 +1,8 @@
-from decimal import Decimal
-
-from sqlalchemy import Column, String, Numeric, DateTime, Text
-from sqlalchemy.orm import DeclarativeBase
+from datetime import UTC, datetime
 import uuid
-from datetime import datetime, UTC
+
+from sqlalchemy import Column, DateTime, Numeric, String, Text
+from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
@@ -21,6 +20,4 @@ class Transaction(Base):
     notes = Column(Text, nullable=True)
     deleted_at = Column(DateTime, nullable=True)  # Soft delete
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
-    updated_at = Column(
-        DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
-    )
+    updated_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))

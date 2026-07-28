@@ -1,21 +1,21 @@
-from datetime import date, UTC, datetime
-import uuid
+from datetime import date
 
 from fastapi.testclient import TestClient
 
-from app.models.transaction import Transaction
 from app.schemas.transaction import TransactionCreate
 from app.services.transaction import TransactionService
-from app.utils.date import get_current_quarter
 
 
 def test_create_transaction(client: TestClient, db_session):
-    resp = client.post("/api/transactions", json={
-        "date": "2026-06-15",
-        "description": "Test sale",
-        "amount": 100.50,
-        "notes": "Some notes",
-    })
+    resp = client.post(
+        "/api/transactions",
+        json={
+            "date": "2026-06-15",
+            "description": "Test sale",
+            "amount": 100.50,
+            "notes": "Some notes",
+        },
+    )
     assert resp.status_code == 201
     data = resp.json()
     assert data["description"] == "Test sale"
@@ -26,21 +26,27 @@ def test_create_transaction(client: TestClient, db_session):
 
 
 def test_create_transaction_validation_error(client: TestClient, db_session):
-    resp = client.post("/api/transactions", json={
-        "date": "2026-06-15",
-        "description": "",
-        "amount": -5,
-    })
+    resp = client.post(
+        "/api/transactions",
+        json={
+            "date": "2026-06-15",
+            "description": "",
+            "amount": -5,
+        },
+    )
     assert resp.status_code == 400
     data = resp.json()
     assert data["error"]["code"] == "VALIDATION_ERROR"
 
 
 def test_create_transaction_missing_field(client: TestClient, db_session):
-    resp = client.post("/api/transactions", json={
-        "date": "2026-06-15",
-        "amount": 50.0,
-    })
+    resp = client.post(
+        "/api/transactions",
+        json={
+            "date": "2026-06-15",
+            "amount": 50.0,
+        },
+    )
     assert resp.status_code == 400
     data = resp.json()
     assert data["error"]["code"] == "VALIDATION_ERROR"
@@ -58,11 +64,14 @@ def test_list_transactions_empty(client: TestClient, db_session):
 def test_list_transactions_pagination(client: TestClient, db_session):
     svc = TransactionService()
     for i in range(3):
-        svc.create(db_session, TransactionCreate(
-            date=date(2026, 6, i + 1),
-            description=f"Item {i}",
-            amount=float(i + 1) * 10,
-        ))
+        svc.create(
+            db_session,
+            TransactionCreate(
+                date=date(2026, 6, i + 1),
+                description=f"Item {i}",
+                amount=float(i + 1) * 10,
+            ),
+        )
 
     resp = client.get("/api/transactions?page=1&limit=2")
     assert resp.status_code == 200
@@ -119,10 +128,13 @@ def test_update_transaction(client: TestClient, db_session):
     svc = TransactionService()
     txn = svc.create(db_session, TransactionCreate(date=date(2026, 6, 1), description="Original", amount=100.0))
 
-    resp = client.put(f"/api/transactions/{txn.id}", json={
-        "description": "Updated",
-        "amount": 200.0,
-    })
+    resp = client.put(
+        f"/api/transactions/{txn.id}",
+        json={
+            "description": "Updated",
+            "amount": 200.0,
+        },
+    )
     assert resp.status_code == 200
     data = resp.json()
     assert data["description"] == "Updated"
@@ -132,13 +144,22 @@ def test_update_transaction(client: TestClient, db_session):
 
 def test_update_transaction_partial(client: TestClient, db_session):
     svc = TransactionService()
-    txn = svc.create(db_session, TransactionCreate(
-        date=date(2026, 6, 1), description="Partial", amount=100.0, notes="Original notes",
-    ))
+    txn = svc.create(
+        db_session,
+        TransactionCreate(
+            date=date(2026, 6, 1),
+            description="Partial",
+            amount=100.0,
+            notes="Original notes",
+        ),
+    )
 
-    resp = client.put(f"/api/transactions/{txn.id}", json={
-        "description": "Changed",
-    })
+    resp = client.put(
+        f"/api/transactions/{txn.id}",
+        json={
+            "description": "Changed",
+        },
+    )
     assert resp.status_code == 200
     data = resp.json()
     assert data["description"] == "Changed"

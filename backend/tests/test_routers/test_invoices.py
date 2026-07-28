@@ -8,11 +8,14 @@ from app.services.transaction import TransactionService
 
 def test_get_invoice(client: TestClient, db_session):
     svc = TransactionService()
-    txn = svc.create(db_session, TransactionCreate(
-        date=date(2026, 6, 15),
-        description="Filament PLA",
-        amount=89.99,
-    ))
+    txn = svc.create(
+        db_session,
+        TransactionCreate(
+            date=date(2026, 6, 15),
+            description="Filament PLA",
+            amount=89.99,
+        ),
+    )
 
     resp = client.get(f"/api/invoices/{txn.id}")
     assert resp.status_code == 200
@@ -32,11 +35,14 @@ def test_get_invoice_not_found(client: TestClient, db_session):
 
 def test_get_invoice_twice_same_number(client: TestClient, db_session):
     svc = TransactionService()
-    txn = svc.create(db_session, TransactionCreate(
-        date=date(2026, 6, 1),
-        description="Test",
-        amount=10.0,
-    ))
+    txn = svc.create(
+        db_session,
+        TransactionCreate(
+            date=date(2026, 6, 1),
+            description="Test",
+            amount=10.0,
+        ),
+    )
 
     resp1 = client.get(f"/api/invoices/{txn.id}")
     resp2 = client.get(f"/api/invoices/{txn.id}")
@@ -45,11 +51,14 @@ def test_get_invoice_twice_same_number(client: TestClient, db_session):
 
 def test_download_invoice_pdf(client: TestClient, db_session):
     svc = TransactionService()
-    txn = svc.create(db_session, TransactionCreate(
-        date=date(2026, 6, 15),
-        description="PDF test",
-        amount=45.00,
-    ))
+    txn = svc.create(
+        db_session,
+        TransactionCreate(
+            date=date(2026, 6, 15),
+            description="PDF test",
+            amount=45.00,
+        ),
+    )
 
     resp = client.get(f"/api/invoices/{txn.id}/download")
     assert resp.status_code == 200
@@ -60,11 +69,14 @@ def test_download_invoice_pdf(client: TestClient, db_session):
 
 def test_download_invoice_pdf_content(client: TestClient, db_session):
     svc = TransactionService()
-    txn = svc.create(db_session, TransactionCreate(
-        date=date(2026, 7, 15),
-        description="PDF content test",
-        amount=123.45,
-    ))
+    txn = svc.create(
+        db_session,
+        TransactionCreate(
+            date=date(2026, 7, 15),
+            description="PDF content test",
+            amount=123.45,
+        ),
+    )
 
     resp = client.get(f"/api/invoices/{txn.id}/download")
     assert resp.status_code == 200

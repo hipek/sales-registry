@@ -1,4 +1,4 @@
-.PHONY: start stop build logs clean dev dev-backend dev-frontend test test-backend test-frontend init frontend-check
+.PHONY: start stop build logs clean dev dev-backend dev-frontend test test-backend test-frontend init frontend-check backend-check
 
 start:
 	docker compose up -d backend-dev frontend-dev
@@ -43,7 +43,7 @@ test-backend:
 	docker compose run --rm -v ./backend/tests:/app/tests backend-dev sh -c "export UV_PROJECT_ENVIRONMENT=.venv-container && uv sync --frozen && uv run pytest -q"
 
 test-frontend:
-	docker compose run --rm --no-deps -v ./frontend:/app -w /app -e CI=true -e NODE_ENV=development frontend-dev sh -c "corepack enable && corepack prepare pnpm@9 --activate && pnpm install --frozen-lockfile && pnpm vitest run --passWithNoTests"
-
-frontend-check:
 	cd frontend && pnpm run lint && ./node_modules/.bin/tsc --noEmit && pnpm run format
+
+backend-check:
+	cd backend && uv sync --frozen && uv run ruff check . && uv run ruff format . --check

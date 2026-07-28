@@ -1,9 +1,10 @@
-from datetime import date, datetime, UTC
+from datetime import UTC, datetime
 from typing import Optional
+
 from sqlalchemy.orm import Session
 
 from app.models.transaction import Transaction
-from app.schemas.transaction import TransactionCreate, TransactionUpdate, TransactionResponse
+from app.schemas.transaction import TransactionCreate, TransactionResponse, TransactionUpdate
 
 
 class TransactionService:
@@ -25,11 +26,7 @@ class TransactionService:
 
     @staticmethod
     def get_by_id(db: Session, transaction_id: str) -> Optional[Transaction]:
-        return (
-            db.query(Transaction)
-            .filter(Transaction.id == transaction_id, Transaction.deleted_at.is_(None))
-            .first()
-        )
+        return db.query(Transaction).filter(Transaction.id == transaction_id, Transaction.deleted_at.is_(None)).first()
 
     @staticmethod
     def list(
@@ -44,29 +41,22 @@ class TransactionService:
 
         if search:
             # Escape LIKE metacharacters to prevent pattern injection
-            escaped = search.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
-            query = query.filter(
-                Transaction.description.ilike(f"%{escaped}%", escape='\\')
-            )
+            escaped = search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+            query = query.filter(Transaction.description.ilike(f"%{escaped}%", escape="\\"))
         if from_date:
             query = query.filter(Transaction.date >= from_date)
         if to_date:
             query = query.filter(Transaction.date <= to_date)
 
         total = query.count()
-        transactions = (
-            query.order_by(Transaction.date.desc())
-            .offset((page - 1) * limit)
-            .limit(limit)
-            .all()
-        )
+        transactions = query.order_by(Transaction.date.desc()).offset((page - 1) * limit).limit(limit).all()
         return transactions, total
 
     @staticmethod
     def update(db: Session, transaction_id: str, data: TransactionUpdate) -> Optional[Transaction]:
-        transaction = db.query(Transaction).filter(
-            Transaction.id == transaction_id, Transaction.deleted_at.is_(None)
-        ).first()
+        transaction = (
+            db.query(Transaction).filter(Transaction.id == transaction_id, Transaction.deleted_at.is_(None)).first()
+        )
         if not transaction:
             return None
 
@@ -82,9 +72,9 @@ class TransactionService:
 
     @staticmethod
     def delete(db: Session, transaction_id: str) -> bool:
-        transaction = db.query(Transaction).filter(
-            Transaction.id == transaction_id, Transaction.deleted_at.is_(None)
-        ).first()
+        transaction = (
+            db.query(Transaction).filter(Transaction.id == transaction_id, Transaction.deleted_at.is_(None)).first()
+        )
         if not transaction:
             return False
         transaction.deleted_at = datetime.now(UTC)
