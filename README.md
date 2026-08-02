@@ -16,7 +16,7 @@ Web app for simplified sales records for unregistered business activity (*dział
 | Layer | Technology |
 |-------|-----------|
 | Frontend | Next.js 16 (App Router), Tailwind CSS v4, shadcn/ui, TypeScript |
-| Backend | Python 3.12+, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2 |
+| Backend | Python 3.14, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2 |
 | PDF | ReportLab |
 | Database | SQLite (dev), PostgreSQL-ready (SQLAlchemy) |
 | Package mgr | uv (Python), pnpm (Node) |
@@ -39,8 +39,9 @@ cp .env.example .env
 # Edit .env — set at least SELLER_NAME and SELLER_ADDRESS
 
 # 3. Start (choose one)
-make start        # Docker production build
-make dev          # local dev (run in 2 terminals)
+make start        # dev containers via Docker Compose
+make dev-backend  # Terminal 1 — FastAPI on :8000
+make dev-frontend # Terminal 2 — Next.js on :3000
 ```
 
 ## Make Commands
@@ -58,7 +59,9 @@ make dev          # local dev (run in 2 terminals)
 | `make dev-frontend` | Start Next.js dev server on `:3000` |
 | `make init` | Run DB migrations on startup |
 | `make ci` | Run lint, typecheck, format checks |
+| `make test` | Run backend tests (pytest) |
 | `make e2e` | Run Playwright e2e tests |
+| `make e2e-clean` | Reset e2e database |
 
 ### Typical dev workflow
 
@@ -146,8 +149,7 @@ Optional:
 # Backend
 cd backend && uv run pytest
 
-# Frontend
-cd frontend && pnpm vitest
+# Frontend: no unit tests yet (vitest configured, no test files)
 ```
 
 ## Database Migrations
