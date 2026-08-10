@@ -16,7 +16,7 @@ Web app for simplified sales records for unregistered business activity (*dział
 | Layer | Technology |
 |-------|-----------|
 | Frontend | Next.js 16 (App Router), Tailwind CSS v4, shadcn/ui, TypeScript |
-| Backend | Python 3.14, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2 |
+| Backend | Python 3.14.7, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2 |
 | PDF | ReportLab |
 | Database | SQLite (dev), PostgreSQL-ready (SQLAlchemy) |
 | Package mgr | uv (Python), pnpm (Node) |
@@ -26,7 +26,7 @@ Web app for simplified sales records for unregistered business activity (*dział
 ### Prerequisites
 
 - Docker + Docker Compose (for production build)
-- OR: Python 3.12+, Node 20+, uv, pnpm (for dev)
+- OR: Python 3.14.7+, Node 20+, uv, pnpm (for dev)
 
 ### Setup
 
